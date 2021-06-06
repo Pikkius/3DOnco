@@ -55,7 +55,7 @@ class model_3DOnco(torch.nn.Module):
         self.maxpool = torch.nn.MaxPool1d(kernel_size=5, padding=2)
 
     def forward(self, x):
-        out_seq = self.seq_feature(x[:, :-1])  # [batch, feature, seq_len, vocab]
+        out_seq = self.seq_feature(x[:].values()[:-1])  # [batch, feature, seq_len, vocab]
         out_seq = self.seq_linear(out_seq)
 
         out_dist = self.dist_feature(x[:, -1])
