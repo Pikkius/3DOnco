@@ -32,10 +32,11 @@ class Protein(Dataset):
         #    distbin += pkl['dist_bin_map'][i] * pkl['dist'][i]
         # features['matrix'] = distbin
 
-        if features['ss'].shape[1] < 3000:
+        protein_len = features['ss'].shape[1]
+        if protein_len < 3000:
             features = self.padding(features)
-        if features['ss'].shape[1] > 3000:
-            features = self.overlapping(features)
+        if protein_len > 3000:
+            features = self.crop(features, protein_len)
 
         fa_name = f'{path}/{name}.fa'  # fa_name=f'{path}/{name}/{name}.fa'
         with open(fa_name) as f:
@@ -59,19 +60,19 @@ class Protein(Dataset):
                 features[key] = np.pad(value, ((0, 0), (0, 3000 - value.shape[1]), (0, 3000 - value.shape[2])))
             else:
                 features[key] = np.pad(value, ((0, 0), (0, 3000 - value.shape[1])))  # 1, dict, seq_len
-        return [features]
+        return features
 
     @staticmethod
-    def overlap(features):
+    def crop(features, protein_len):
+        index_start = np.random.randint(0, protein_len - 3000)
         for key, value in features.items():
+
             if key == 'matrix':
-                new_value_1 = value[:, :3000, :3000]
-                new_value_2 = value[:, -3000:, -3000:]
-                features[key] = list(new_value_1, new_value_2)  # parti, dict, seq_len
+                features[key] = value[:, index_start:index_start+3000, index_start:index_start+3000]
+
             else:
-                new_value_1 = value[:, :3000]
-                new_value_2 = value[:, -3000:]
-                features[key] = list(new_value_1, new_value_2)
+                features[key] = value[:, index_start:index_start+3000]
+
         return features
 
     @staticmethod
