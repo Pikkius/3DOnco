@@ -21,7 +21,7 @@ class model_3DOnco(torch.nn.Module):
 
         # [batch, bins, seq, seq]
         self.dist_feature = torch.nn.Sequential(
-            torch.nn.Conv2d(inputs_voc, hidden_dim*2, stride=4, padding=2, kernel_size=7, bias=False),
+            torch.nn.Conv2d(inputs_voc[-1], hidden_dim*2, stride=4, padding=2, kernel_size=7, bias=False),
             torch.nn.BatchNorm2d(hidden_dim*2),
             torch.nn.ReLU(inplace=True),
             torch.nn.MaxPool2d(kernel_size=5, stride=2, padding=2),  # [batch, bins, seq, seq]
