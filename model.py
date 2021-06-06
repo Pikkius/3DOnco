@@ -21,7 +21,7 @@ class model_3DOnco(torch.nn.Module):
 
         # [batch, bins, seq, seq]
         self.dist_feature = torch.nn.Sequential(
-            torch.nn.Conv2d(input_voc, hidden_dim*2, stride=4, padding=2, kernel_size=7, bias=False),
+            torch.nn.Conv2d(inputs_voc, hidden_dim*2, stride=4, padding=2, kernel_size=7, bias=False),
             torch.nn.BatchNorm2d(hidden_dim*2),
             torch.nn.ReLU(inplace=True),
             torch.nn.MaxPool2d(kernel_size=5, stride=2, padding=2),  # [batch, bins, seq, seq]
@@ -92,9 +92,9 @@ class seq_linear(torch.nn.Module):
 
 class seq_conv(torch.nn.Module):
 
-    def __init__(self, input_voc, hidden_dim=8):
+    def __init__(self, inputs_voc, hidden_dim=8):
         super(seq_conv, self).__init__()
-        self.conv = torch.nn.Conv1d(input_voc, hidden_dim, stride=2, padding=2, kernel_size=5, bias=False)
+        self.conv = torch.nn.Conv1d(inputs_voc, hidden_dim, stride=2, padding=2, kernel_size=5, bias=False)
         self.bn1 = torch.nn.BatchNorm1d(hidden_dim)
         self.relu = torch.nn.ReLU(inplace=True)
         self.maxpool = torch.nn.MaxPool1d(kernel_size=5, padding=2)
