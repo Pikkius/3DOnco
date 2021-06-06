@@ -25,40 +25,49 @@ class model_3DOnco(torch.nn.Module):
             torch.nn.BatchNorm2d(hidden_dim*2),
             torch.nn.ReLU(inplace=True),
             torch.nn.MaxPool2d(kernel_size=5, stride=2, padding=2),  # [batch, bins, seq, seq]
-            torch.nn.Dropout(p=0.5))
+            torch.nn.Dropout()
+        )
 
         # non so la dimensione (da stampare)
-        self.dist_linear = torch.nn.Linear(hidden_dim*2, hidden_dim*4)  # [batch, seq, seq, bins]
-        self.dist_linear2 = torch.nn.Linear(hidden_dim * 2, hidden_dim * 4)
-        self.seq_linear = torch.nn.Linear(hidden_dim, hidden_dim*4)
+        self.dist_linear_2d = torch.nn.Sequential(
+            torch.nn.Linear(hidden_dim*2, hidden_dim*4),  # [batch, seq, seq, bins]
+            torch.nn.ReLU(inplace=True),
+            torch.nn.Dropout()
+        )
+        self.dist_linear_1d = torch.nn.Sequential(
+            torch.nn.Linear(hidden_dim * 2, hidden_dim * 4),
+            torch.nn.ReLU(inplace=True),
+            torch.nn.Dropout()
+        )
+        self.seq_linear = torch.nn.Sequential(
+            torch.nn.Linear(hidden_dim, hidden_dim*4),
+            torch.nn.ReLU(inplace=True),
+            torch.nn.Dropout()
+        )
 
-        self.relu = torch.nn.ReLU(inplace=True)
-
-        self.linear = torch.nn.Linear()
+        self.classifier = torch.nn.Sequential(
+            torch.nn.BatchNorm1d(hhidden_dim * 4),
+            torch.nn.Linear(hidden_dim * 4, hidden_dim * 4),
+            torch.nn.ReLU(inplace=True),
+            torch.nn.Linear(hidden_dim * 4, 1)
+        )
 
         self.maxpool = torch.nn.MaxPool1d(kernel_size=5, padding=2)
 
     def forward(self, x):
         out_seq = self.seq_feature(x[:, :-1])  # [batch, feature, seq_len, vocab]
         out_seq = self.seq_linear(out_seq)
-        out_seq = self.relu(out_seq)
 
         out_dist = self.dist_feature(x[:, -1])
         print(out_dist.shape)
-        out_dist = self.dist_linear(out_dist)
-        out_dist = self.relu(out_dist)
+        out_dist = self.dist_linear_2d(out_dist)
         out_dist = out_dist.view(out_dist.size(0), -1)
         print(out_dist.shape)
-        out_dist = self.dist_linear2(out_dist)
-        out_dist = self.relu(out_dist)
+        out_dist = self.dist_linear_1d(out_dist)
 
         # reunion
         out = np.append(out_seq, out_dist.unsqueeze(1))  # [batch, feature, seq_len, vocab]
-
-
-
-        out = self.maxpool(out)
-        out = self.dp(out)
+        out = self.classifier(out)
 
         return out
 
