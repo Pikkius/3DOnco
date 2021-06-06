@@ -46,7 +46,7 @@ class model_3DOnco(torch.nn.Module):
         )
 
         self.classifier = torch.nn.Sequential(
-            torch.nn.BatchNorm1d(hhidden_dim * 4),
+            torch.nn.BatchNorm1d(hidden_dim * 4),
             torch.nn.Linear(hidden_dim * 4, hidden_dim * 4),
             torch.nn.ReLU(inplace=True),
             torch.nn.Linear(hidden_dim * 4, 1)
