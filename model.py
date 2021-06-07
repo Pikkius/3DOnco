@@ -30,7 +30,7 @@ class model_3DOnco(torch.nn.Module):
 
         # non so la dimensione (da stampare)
         self.dist_linear_2d = torch.nn.Sequential(
-            torch.nn.Linear(hidden_dim*2, hidden_dim*4),  # [batch, seq, seq, bins]
+            torch.nn.Linear(hidden_dim*2, hidden_dim*4),  # [batch, bins, seq, seq, bins]
             torch.nn.ReLU(inplace=True),
             torch.nn.Dropout()
         )
