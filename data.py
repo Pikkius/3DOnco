@@ -1,5 +1,7 @@
 import numpy as np
 import os
+
+import torch
 from torch.utils.data import Dataset
 
 
@@ -43,9 +45,13 @@ class Protein(Dataset):
             header = str(f.readlines())
             label = int((header.split(',')[1]).split(':')[1])
             f.close()
-        features = list(features.values())
-        print(features)
-        return features, label
+
+        return (torch.tensor(features['seq'], dtype=torch.float),
+                torch.tensor(features['ss'], dtype=torch.float),
+                torch.tensor(features['phi'], dtype=torch.float),
+                torch.tensor(features['psi'], dtype=torch.float),
+                torch.tensor(features['matrix'], dtype=torch.float),
+                torch.tensor(label, dtype=torch.float))
 
     def __len__(self):
 
@@ -86,7 +92,7 @@ class Protein(Dataset):
             "S": 15, "T": 16, "V": 17,
             "W": 18, "Y": 19,
         }
-        matrix = np.zeros(20, (len(sequence)))
+        matrix = np.zeros((20, len(sequence)))
         for index, el in enumerate(sequence):
             matrix[encoding[el]][index] = 1
 
