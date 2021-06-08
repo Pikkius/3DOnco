@@ -40,8 +40,6 @@ if __name__ == '__main__':
 
     test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=0)
 
-    res = dataset.__getitem__(1)
-
     inputs_voc = [20, 9, 37, 37, 10]
 
     LR = 0.007  # The initial Learning Rate
