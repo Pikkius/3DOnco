@@ -10,29 +10,25 @@ class Protein(Dataset):
     def __init__(self, root):
         self.root = root
         self.prot_names = dict()
+        self.labels = get_labels(self)
         for el in list(os.listdir(self.root)):
-            if el[-2:] == 'fa':
-                key, value = el.split('_', 1)
-                self.prot_names[key] = value[:-3]
 
-        print(self.prot_names)
+            key, value = el.split('_', 1)
+            self.prot_names[key] = value
 
     def __getitem__(self, index):
 
         features = dict()
         index = str(index)
+
         name = f'{index}_{self.prot_names[index]}'
-        path = self.root
-        pkl = np.load(f'{path}/{name}_prediction.pkl', allow_pickle=True)
+        pkl = np.load(f'{self.root}/{name}/{name}_prediction.pkl', allow_pickle=True)
+
         features['seq'] = self.create_sequence_matrix(pkl['seq'])
         features['ss'] = pkl['ss']
         features['phi'] = pkl['phi']
         features['psi'] = pkl['psi']
         features['matrix'] = pkl['dist']
-        # distbin = np.zeros_like(pkl['dist'][0])
-        # for i in range(10):
-        #    distbin += pkl['dist_bin_map'][i] * pkl['dist'][i]
-        # features['matrix'] = distbin
 
         protein_len = features['ss'].shape[1]
         if protein_len < 3000:
@@ -40,7 +36,7 @@ class Protein(Dataset):
         if protein_len > 3000:
             features = self.crop(features, protein_len)
 
-        fa_name = f'{path}/{name}.fa'  # fa_name=f'{path}/{name}/{name}.fa'
+        fa_name = f'{self.root}/{name}/{name}.fa'  # fa_name=f'{path}/{name}/{name}.fa'
         with open(fa_name) as f:
             header = str(f.readlines())
             label = int((header.split(',')[1]).split(':')[1])
@@ -55,9 +51,21 @@ class Protein(Dataset):
 
     def __len__(self):
 
-        length = int(
-            len(list(os.listdir(self.root))) / 2)  # Provide a way to get the length (number of elements) of the dataset
-        return length
+        # Provide a way to get the length (number of elements) of the dataset
+        return len(self.labels)
+
+    def get_labels(self):
+        labels = []
+        for el in list(os.listdir(self.root)):
+            el = el + '/' + el + '_prediction.pkl'  # 12_asd_Asd/12_asd_Asd_prediction.pkl
+
+            if os.path.isfile(el):
+                with open(self.root + '/' + el, 'r') as f:
+                    header = str(f.readlines())
+                    label = int((header.split(',')[1]).split(':')[1])
+                    labels.append(label)
+                    f.close()
+        return labels
 
     @staticmethod
     def padding(features):
@@ -102,8 +110,10 @@ class Protein(Dataset):
 def get_labels(root):
     labels = []
     for el in list(os.listdir(root)):
-        if el[-2:] == 'fa':
-            with open(root + '/' + str(el)) as f:
+        el = el + '/' + el + '_prediction.pkl'  # 12_asd_Asd/12_asd_Asd_prediction.pkl
+
+        if os.path.isfile(el):
+            with open(root + '/' + el, 'r') as f:
                 header = str(f.readlines())
                 label = int((header.split(',')[1]).split(':')[1])
                 labels.append(label)
