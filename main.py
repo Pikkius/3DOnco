@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 
 import torch
@@ -7,18 +9,20 @@ from torch.utils.data import Subset, DataLoader
 
 from sklearn.model_selection import train_test_split
 
+import copy
+from datetime import datetime
+
 from tqdm import tqdm
 
-from data import get_labels, Protein
+from data import Protein
 from model import model_3DOnco
 
 if __name__ == '__main__':
     dataset = Protein(root='.data')
 
-    labels = get_labels(root='.data')
-    lines = np.arange(len(labels))
-    train_tmp_indexes, test_indexes, label_train_tmp, label_test = train_test_split(lines, labels,
-                                                                                    test_size=0.1, stratify=labels)
+    train_tmp_indexes, test_indexes, label_train_tmp, label_test = train_test_split(dataset.indexs, dataset.labels,
+                                                                                    test_size=0.1,
+                                                                                    stratify=dataset.labels)
     train_indexes, val_indexes, label_train, label_val = train_test_split(train_tmp_indexes, label_train_tmp,
                                                                           test_size=0.2, stratify=label_train_tmp)
 
@@ -33,7 +37,8 @@ if __name__ == '__main__':
     DEVICE = 'cpu'
     BATCH_SIZE = 1
 
-    # Dataloaders iterate over pytorch datasets and transparently provide useful functions (e.g. parallelization and shuffling)
+    # Dataloaders iterate over pytorch datasets and transparently provide useful functions (e.g. parallelization and
+    # shuffling)
 
     train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=0, drop_last=True)
     val_dataloader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=0, drop_last=True)
@@ -42,6 +47,7 @@ if __name__ == '__main__':
 
     inputs_voc = [20, 9, 37, 37, 10]
 
+    save_out = True
     LR = 0.007  # The initial Learning Rate
     MOMENTUM = 0.9  # Hyperparameter for SGD, keep this at 0.9 when using SGD
     WEIGHT_DECAY = 5e-5  # Regularization, you can keep this at the default
@@ -56,7 +62,13 @@ if __name__ == '__main__':
     optimizer = optim.SGD(parameters_to_optimize, lr=LR, momentum=MOMENTUM, weight_decay=WEIGHT_DECAY)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=STEP_SIZE, gamma=GAMMA)
 
-    for epoch in range(NUM_EPOCHS):
+    loss_list_train = []
+    acc_list_train = []
+    loss_list_val = []
+    acc_list_val = []
+    max_accuracy = 0
+
+    for epoch in tqdm(range(NUM_EPOCHS)):
         logs = {}
         tot_train_loss = 0
         tot_val_loss = 0
@@ -66,7 +78,7 @@ if __name__ == '__main__':
         net.train()  # Sets module in training mode
         # Iterate over the dataset
 
-        for seq, ss, phi, psi, matrix, labels in train_dataloader:
+        for seq, ss, phi, psi, matrix, labels in tqdm(train_dataloader):
             # Bring data over the device of choice
 
             seq = seq.to(DEVICE)
@@ -107,17 +119,16 @@ if __name__ == '__main__':
             current_step += 1
 
         # Calculate Accuracy
-        '''train_accuracy = running_corrects / float(len(train_dataset))
+        train_accuracy = running_corrects / float(len(train_dataset))
         epoch_train_loss = tot_train_loss / len(train_dataset)
         loss_list_train.append(epoch_train_loss)
-        acc_list_train.append(train_accuracy)'''
+        acc_list_train.append(train_accuracy)
 
         net.train(False)  # Set Network to evaluation mode
         running_corrects = 0
 
         with torch.no_grad():
             for seq, ss, phi, psi, matrix, labels in tqdm(val_dataloader):
-
                 seq = seq.to(DEVICE)
                 ss = ss.to(DEVICE)
                 phi = phi.to(DEVICE)
@@ -140,14 +151,29 @@ if __name__ == '__main__':
                 tot_val_loss += loss.item() * seq.size(0)
 
         # Calculate Accuracy
-        '''val_accuracy = running_corrects / float(len(val_dataset))
+        val_accuracy = running_corrects / float(len(val_dataset))
         epoch_val_loss = tot_val_loss / len(val_dataset)
         loss_list_val.append(epoch_val_loss)
         acc_list_val.append(val_accuracy)
 
-        if (val_accuracy > max_accuracy):
+        if val_accuracy > max_accuracy:
             max_accuracy = val_accuracy
-            best_net = copy.deepcopy(net)'''
+            best_net = copy.deepcopy(net)
 
         # Step the scheduler
         scheduler.step()
+
+    if save_out:
+        dateTimeObj = datetime.now()
+        timestampStr = dateTimeObj.strftime("%d_%b_%Y_%H)")
+
+        os.mkdir(timestampStr)
+
+        # np.save(timestampStr'/config.txt', config)
+
+        np.save(timestampStr+'/result.txt', [loss_list_train, acc_list_train, loss_list_val, acc_list_val])
+        loss_list_train = []
+        acc_list_train = []
+        loss_list_val = []
+        acc_list_val = []
+        max_accuracy = 0
