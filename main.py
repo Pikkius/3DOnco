@@ -94,7 +94,7 @@ if __name__ == '__main__':
             # Update Corrects
             running_corrects += torch.sum(preds == labels.data).data.item()
 
-            tot_train_loss += loss.item() * images.size(0)
+            tot_train_loss += loss.item() * seq.size(0)
 
             # Log loss
             if current_step % LOG_FREQUENCY == 0:
@@ -116,12 +116,17 @@ if __name__ == '__main__':
         running_corrects = 0
 
         with torch.no_grad():
-            for images, labels in tqdm(val_dataloader):
-                images = images.to(DEVICE)
+            for seq, ss, phi, psi, matrix, labels in tqdm(val_dataloader):
+
+                seq = seq.to(DEVICE)
+                ss = ss.to(DEVICE)
+                phi = phi.to(DEVICE)
+                psi = psi.to(DEVICE)
+                matrix = matrix.to(DEVICE)
                 labels = labels.to(DEVICE)
 
                 # Forward Pass
-                outputs = net(images)
+                outputs = net([seq, ss, phi, psi, matrix])
 
                 # Compute loss based on output and ground truth
                 loss = criterion(outputs, labels)
@@ -132,7 +137,7 @@ if __name__ == '__main__':
                 # Update Corrects
                 running_corrects += torch.sum(preds == labels.data).data.item()
 
-                tot_val_loss += loss.item() * images.size(0)
+                tot_val_loss += loss.item() * seq.size(0)
 
         # Calculate Accuracy
         '''val_accuracy = running_corrects / float(len(val_dataset))

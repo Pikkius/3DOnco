@@ -44,7 +44,7 @@ class model_3DOnco(torch.nn.Module):
             torch.nn.Linear(hidden_dim * 16 * hidden_dim * 5, hidden_dim * 4),
             torch.nn.ReLU(inplace=True),
             torch.nn.Linear(hidden_dim * 4, 2),
-            torch.nn.Softmax()
+            torch.nn.Softmax(dim=1)
         )
 
     def forward(self, x):

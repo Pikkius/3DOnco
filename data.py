@@ -46,12 +46,12 @@ class Protein(Dataset):
             label = int((header.split(',')[1]).split(':')[1])
             f.close()
 
-        return (torch.tensor(features['seq'], dtype=torch.double),
-                torch.tensor(features['ss'], dtype=torch.double),
-                torch.tensor(features['phi'], dtype=torch.double),
-                torch.tensor(features['psi'], dtype=torch.double),
-                torch.tensor(features['matrix'], dtype=torch.double),
-                torch.tensor(label, dtype=torch.double))
+        return (torch.tensor(features['seq'], dtype=torch.float),
+                torch.tensor(features['ss'], dtype=torch.float),
+                torch.tensor(features['phi'], dtype=torch.float),
+                torch.tensor(features['psi'], dtype=torch.float),
+                torch.tensor(features['matrix'], dtype=torch.float),
+                torch.tensor(label, dtype=torch.long))
 
     def __len__(self):
 
