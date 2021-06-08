@@ -8,9 +8,14 @@ from torch.utils.data import Dataset
 class Protein(Dataset):
 
     def __init__(self, root):
+
         self.root = root
         self.prot_names = dict()
-        self.labels = get_labels(self)
+        self.labels = []
+        self.indexs = []
+
+        self.construct_labels()
+
         for el in list(os.listdir(self.root)):
 
             key, value = el.split('_', 1)
@@ -54,18 +59,18 @@ class Protein(Dataset):
         # Provide a way to get the length (number of elements) of the dataset
         return len(self.labels)
 
-    def get_labels(self):
-        labels = []
+    def construct_labels(self):
+
         for el in list(os.listdir(self.root)):
             el = el + '/' + el + '_prediction.pkl'  # 12_asd_Asd/12_asd_Asd_prediction.pkl
 
             if os.path.isfile(el):
+                self.indexs.append(el.split('_')[0])
                 with open(self.root + '/' + el, 'r') as f:
                     header = str(f.readlines())
                     label = int((header.split(',')[1]).split(':')[1])
-                    labels.append(label)
+                    self.labels.append(label)
                     f.close()
-        return labels
 
     @staticmethod
     def padding(features):
