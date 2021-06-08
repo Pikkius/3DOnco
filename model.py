@@ -72,6 +72,7 @@ class model_3DOnco(torch.nn.Module):
         return out
 
 
+# sistemare il linear
 class seq_linear(torch.nn.Module):
 
     def __init__(self, input_voc, hidden_dim=8):
