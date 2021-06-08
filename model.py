@@ -72,7 +72,6 @@ class model_3DOnco(torch.nn.Module):
         print(out.shape)
         out = self.classifier(out.view(out_dist.size(0), -1))
         print(out.shape)
-        raise('sada')
 
         return out
 
