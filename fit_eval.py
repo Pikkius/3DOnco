@@ -1,4 +1,4 @@
-import os
+import matplotlib.pyplot as plt
 
 import numpy as np
 
@@ -9,7 +9,6 @@ import torch.optim as optim
 from model import model_3DOnco
 
 import copy
-from datetime import datetime
 
 from tqdm import tqdm
 from torch.utils.data import DataLoader
@@ -97,17 +96,23 @@ def Train(train_set, val_set, config):
     print('Best model found at step {}'.format(best_step))
 
     if config.save_out:
-        if config.out_dir is None:
-            dateTimeObj = datetime.now()
-            out_dir = dateTimeObj.strftime("%d_%b_%Y_%H)")
+        np.save(config.out_dir + '/result.txt', [loss_list_train, acc_list_train, loss_list_val, acc_list_val])
 
-            os.mkdir(out_dir)
-        else:
-            out_dir = config.out_dir
+    if config.save_graph:
 
-        # np.save(timestampStr'/config.txt', config)
+        plt.title('Loss')
+        plt.plot(loss_list_train, label='Train')
+        plt.plot(loss_list_val, label='Val')
+        plt.legend()
+        plt.savefig(config.out_dir + '/loss.png')
+        plt.close()
 
-        np.save(out_dir + '/result.txt', [loss_list_train, acc_list_train, loss_list_val, acc_list_val])
+        plt.title('Accuracy')
+        plt.plot(acc_list_train, label='Train')
+        plt.plot(acc_list_val, label='Val')
+        plt.legend()
+        plt.savefig(config.out_dir + '/loss.png')
+        plt.close()
 
     return best_net
 
@@ -152,3 +157,5 @@ def evaluation(model, dataset, criterion=None, device='cpu'):
         return accuracy, epoch_loss
     else:
         return accuracy
+
+
