@@ -62,11 +62,13 @@ class Protein(Dataset):
     def construct_labels(self):
 
         for el in list(os.listdir(self.root)):
+            el_fa = el + '/' + el + '.fa'
             el = el + '/' + el + '_prediction.pkl'  # 12_asd_Asd/12_asd_Asd_prediction.pkl
-
-            if os.path.isfile(el):
+            
+            if os.path.isfile(self.root+'/'+el):
+                print(el)
                 self.indexs.append(el.split('_')[0])
-                with open(self.root + '/' + el, 'r') as f:
+                with open(self.root + '/' + el_fa, 'r') as f:
                     header = str(f.readlines())
                     label = int((header.split(',')[1]).split(':')[1])
                     self.labels.append(label)
