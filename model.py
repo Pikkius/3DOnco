@@ -67,7 +67,6 @@ class model_3DOnco(torch.nn.Module):
         out = torch.cat([out_seq, out_dist.unsqueeze(1)], dim=1)  # [batch, feature, seq_len, vocab]
 
         out = self.classifier(out.view(out_dist.size(0), -1))
-        print(out.shape)
 
         return out
 

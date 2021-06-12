@@ -66,7 +66,6 @@ class Protein(Dataset):
             el = el + '/' + el + '_prediction.pkl'  # 12_asd_Asd/12_asd_Asd_prediction.pkl
             
             if os.path.isfile(self.root+'/'+el):
-                print(el)
                 self.indexs.append(el.split('_')[0])
                 with open(self.root + '/' + el_fa, 'r') as f:
                     header = str(f.readlines())

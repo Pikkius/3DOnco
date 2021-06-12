@@ -5,7 +5,7 @@ from datetime import datetime
 
 class Config:
     DEVICE = 'cpu'
-    BATCH_SIZE = 1
+    BATCH_SIZE = 25
 
     inputs_voc = [20, 9, 37, 37, 10]
 
@@ -14,10 +14,10 @@ class Config:
     LR = 0.007  # The initial Learning Rate
     MOMENTUM = 0.9  # Hyperparameter for SGD, keep this at 0.9 when using SGD
     WEIGHT_DECAY = 5e-5  # Regularization, you can keep this at the default
-    NUM_EPOCHS = 5  # Total number of training epochs (iterations over dataset)
+    NUM_EPOCHS = 20  # Total number of training epochs (iterations over dataset)
     STEP_SIZE = 20
     GAMMA = 0.1
-    LOG_FREQUENCY = 1
+    LOG_FREQUENCY = 20
 
     hidden_dim = 8
 

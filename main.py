@@ -8,7 +8,7 @@ from fit_eval import Train, Test
 
 
 if __name__ == '__main__':
-    dataset = Protein(root='Fastas')
+    dataset = Protein(root='../Fastas')
 
     train_tmp_indexes, test_indexes, label_train_tmp, label_test = train_test_split(dataset.indexs, dataset.labels,
                                                                                     test_size=0.1,

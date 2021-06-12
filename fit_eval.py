@@ -9,8 +9,6 @@ import torch.optim as optim
 from model import model_3DOnco
 
 import copy
-
-from tqdm import tqdm
 from torch.utils.data import DataLoader
 
 
@@ -32,7 +30,7 @@ def Train(train_set, val_set, config):
     max_accuracy = 0
     current_step = 0
 
-    for epoch in tqdm(range(config.NUM_EPOCHS)):
+    for epoch in range(config.NUM_EPOCHS):
 
         tot_train_loss = 0
         running_corrects = 0
@@ -41,7 +39,7 @@ def Train(train_set, val_set, config):
         net.train()  # Sets module in training mode
         # Iterate over the dataset
 
-        for x in tqdm(train_dataloader):
+        for x in train_dataloader:
             # Bring data over the device of choice
             x = [x[i].to(config.DEVICE) for i in range(len(x))]
 
@@ -129,12 +127,12 @@ def evaluation(model, dataset, criterion=None, device='cpu'):
     tot_loss = 0
 
     with torch.no_grad():
-        for x in tqdm(dataset):
+        for x in dataset:
 
             x = [x[i].to(device) for i in range(len(x))]
 
             # Forward Pass
-            outputs = model(x[-1])
+            outputs = model(x[:-1])
 
             # Compute loss based on output and ground truth
             if criterion is not None:
