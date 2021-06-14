@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-from model import model_3DOnco
+from treDOnco.model import model_3DOnco
 
 import copy
 from torch.utils.data import DataLoader
