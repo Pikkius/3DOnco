@@ -17,6 +17,8 @@ def Train(train_set, val_set, config):
     val_dataloader = DataLoader(val_set, batch_size=config.BATCH_SIZE, shuffle=False, num_workers=0, drop_last=True)
 
     net = model_3DOnco('conv', config.inputs_voc, config.hidden_dim)
+    net = net.to(config.DEVICE)
+    
     criterion = nn.CrossEntropyLoss()
     parameters_to_optimize = net.parameters()
     optimizer = optim.SGD(parameters_to_optimize, lr=config.LR,
@@ -35,7 +37,7 @@ def Train(train_set, val_set, config):
         tot_train_loss = 0
         running_corrects = 0
 
-        print('Starting epoch {}/{}, LR = {}'.format(epoch + 1, config.NUM_EPOCHS, scheduler.get_lr()))
+        print('Starting epoch {}/{}, LR = {}'.format(epoch + 1, config.NUM_EPOCHS, scheduler.get_last_lr()))
         net.train()  # Sets module in training mode
         # Iterate over the dataset
 
