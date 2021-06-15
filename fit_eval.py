@@ -31,6 +31,7 @@ def Train(train_set, val_set, config):
     acc_list_val = []
     max_accuracy = 0
     current_step = 0
+    train_accuracy = 0
 
     for epoch in range(config.NUM_EPOCHS):
 
@@ -65,7 +66,7 @@ def Train(train_set, val_set, config):
 
             # Log loss
             if current_step % config.LOG_FREQUENCY == 0:
-                print('Step {}, Loss {}'.format(current_step, loss.item()))
+                print('Step {}, Loss {}, Last_accuracy{}'.format(current_step, loss.item(), train_accuracy))
 
             # Compute gradients for each layer and update weights
             loss.backward()  # backward pass: computes gradients
@@ -93,10 +94,8 @@ def Train(train_set, val_set, config):
         # Step the scheduler
         scheduler.step(epoch)
 
-    print('Best model found at step {}'.format(best_step))
-
-    if config.save_out:
-        np.save(config.out_dir + '/result.txt', [loss_list_train, acc_list_train, loss_list_val, acc_list_val])
+        if config.save_out:
+            np.save(config.out_dir + '/result.txt', [loss_list_train, acc_list_train, loss_list_val, acc_list_val])
 
     if config.save_graph:
 
@@ -113,6 +112,9 @@ def Train(train_set, val_set, config):
         plt.legend()
         plt.savefig(config.out_dir + '/loss.png')
         plt.close()
+
+
+    print('Best model found at step {}'.format(best_step))
 
     return best_net
 
