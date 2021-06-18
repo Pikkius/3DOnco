@@ -52,6 +52,18 @@ class model_3DOnco(torch.nn.Module):
             torch.nn.Softmax(dim=1)
         )
 
+    def to(self, device):
+      super(model_3DOnco, self).to(device)
+      for i in range(len(self.seq_feature)):
+        self.seq_feature[i] = self.seq_feature[i].to(device)
+      return self
+
+    def train(self, flag=True):
+      super(model_3DOnco, self).train(flag)
+      for i in range(len(self.seq_feature)):
+        self.seq_feature[i] = self.seq_feature[i].train(flag)
+      return self
+
     def forward(self, x):
         # [feature, batch, vocab, seq_len]
         out_seq = []

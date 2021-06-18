@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-from model import model_3DOnco
+from treDOnco.model import model_3DOnco
 
 import copy
 from torch.utils.data import DataLoader
@@ -17,6 +17,8 @@ def Train(train_set, val_set, config):
     val_dataloader = DataLoader(val_set, batch_size=config.BATCH_SIZE, shuffle=False, num_workers=0, drop_last=True)
 
     net = model_3DOnco('conv', config.inputs_voc, config.hidden_dim, config.SEQ_LEN)
+    net = net.to(config.DEVICE)
+
     criterion = nn.CrossEntropyLoss()
     parameters_to_optimize = net.parameters()
     optimizer = optim.SGD(parameters_to_optimize, lr=config.LR,
@@ -29,13 +31,14 @@ def Train(train_set, val_set, config):
     acc_list_val = []
     max_accuracy = 0
     current_step = 0
+    train_accuracy = 0
 
     for epoch in range(config.NUM_EPOCHS):
 
         tot_train_loss = 0
         running_corrects = 0
 
-        print('Starting epoch {}/{}, LR = {}'.format(epoch + 1, config.NUM_EPOCHS, scheduler.get_lr()))
+        print('Starting epoch {}/{}, LR = {}'.format(epoch + 1, config.NUM_EPOCHS, scheduler.get_last_lr()))
         net.train()  # Sets module in training mode
         # Iterate over the dataset
 
@@ -63,7 +66,7 @@ def Train(train_set, val_set, config):
 
             # Log loss
             if current_step % config.LOG_FREQUENCY == 0:
-                print('Step {}, Loss {}'.format(current_step, loss.item()))
+                print('Step {}, Loss {}, Last_accuracy{}'.format(current_step, loss.item(), train_accuracy))
 
             # Compute gradients for each layer and update weights
             loss.backward()  # backward pass: computes gradients
@@ -91,10 +94,8 @@ def Train(train_set, val_set, config):
         # Step the scheduler
         scheduler.step(epoch)
 
-    print('Best model found at step {}'.format(best_step))
-
-    if config.save_out:
-        np.save(config.out_dir + '/result.txt', [loss_list_train, acc_list_train, loss_list_val, acc_list_val])
+        if config.save_out:
+            np.save(config.out_dir + '/result.txt', [loss_list_train, acc_list_train, loss_list_val, acc_list_val])
 
     if config.save_graph:
 
@@ -111,6 +112,8 @@ def Train(train_set, val_set, config):
         plt.legend()
         plt.savefig(config.out_dir + '/loss.png')
         plt.close()
+
+    print('Best model found at step {}'.format(best_step))
 
     return best_net
 
@@ -155,5 +158,3 @@ def evaluation(model, dataset, criterion=None, device='cpu'):
         return accuracy, epoch_loss
     else:
         return accuracy
-
-

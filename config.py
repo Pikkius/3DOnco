@@ -27,7 +27,9 @@ class Config:
     def __init__(self, dictionay=None):
         if dictionay is not None:
             self.load_config(dictionay)
-        setattr(self, 'out_dir', datetime.now().strftime("%d_%b_%Y_%H)"))
+        if self.out_dir is None:
+            setattr(self, 'out_dir', datetime.now().strftime("%d_%b_%Y_%H"))
+            os.mkdir(self.out_dir)
 
     def __getitem__(self, item):
         return getattr(self, item)
