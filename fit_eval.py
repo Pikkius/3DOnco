@@ -66,7 +66,7 @@ def Train(train_set, val_set, config):
 
             # Log loss
             if current_step % config.LOG_FREQUENCY == 0:
-                print('Step {}, Loss {}, Last_accuracy{}'.format(current_step, loss.item(), train_accuracy))
+                print('Step {}, Loss {}, Last_accuracy{}'.format(current_step, loss.item(), val_accuracy))
 
             # Compute gradients for each layer and update weights
             loss.backward()  # backward pass: computes gradients
