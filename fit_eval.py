@@ -31,7 +31,7 @@ def Train(train_set, val_set, config):
     acc_list_val = []
     max_accuracy = 0
     current_step = 0
-    train_accuracy = 0
+    val_accuracy = 0
 
     for epoch in range(config.NUM_EPOCHS):
 
