@@ -13,8 +13,8 @@ from torch.utils.data import DataLoader
 
 
 def Train(train_set, val_set, config):
-    train_dataloader = DataLoader(train_set, batch_size=config.BATCH_SIZE, shuffle=True, num_workers=0, drop_last=True)
-    val_dataloader = DataLoader(val_set, batch_size=config.BATCH_SIZE, shuffle=False, num_workers=0, drop_last=True)
+    train_dataloader = DataLoader(train_set, batch_size=config.BATCH_SIZE, shuffle=True, num_workers=0, drop_last=False)
+    val_dataloader = DataLoader(val_set, batch_size=config.BATCH_SIZE, shuffle=False, num_workers=0, drop_last=False)
 
     net = model_3DOnco('conv', config.inputs_voc, config.hidden_dim, config.SEQ_LEN)
     net = net.to(config.DEVICE)
@@ -62,7 +62,7 @@ def Train(train_set, val_set, config):
             # Update Corrects
             running_corrects += torch.sum(preds == x[-1].data).data.item()
 
-            tot_train_loss += loss.item() * config.BATCH_SIZE
+            tot_train_loss += loss.item() * x.shape[0]
 
             # Log loss
             if current_step % config.LOG_FREQUENCY == 0:
