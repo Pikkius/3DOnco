@@ -62,7 +62,7 @@ def Train(train_set, val_set, config):
             # Update Corrects
             running_corrects += torch.sum(preds == x[-1].data).data.item()
 
-            tot_train_loss += loss.item() * x.shape[0]
+            tot_train_loss += loss.item() * x[0].shape[0]
 
             # Log loss
             if current_step % config.LOG_FREQUENCY == 0:
