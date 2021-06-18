@@ -5,7 +5,7 @@ from datetime import datetime
 
 class Config:
     DEVICE = 'cpu'
-    BATCH_SIZE = 25
+    BATCH_SIZE = 1
 
     inputs_voc = [20, 9, 37, 37, 10]
 
@@ -18,6 +18,7 @@ class Config:
     STEP_SIZE = 20
     GAMMA = 0.1
     LOG_FREQUENCY = 20
+    SEQ_LEN = 1000
 
     hidden_dim = 8
 

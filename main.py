@@ -8,7 +8,9 @@ from fit_eval import Train, Test
 
 
 if __name__ == '__main__':
-    dataset = Protein(root='../Fastas')
+
+    config = Config()
+    dataset = Protein(root='../Fastas', seq_len=config.SEQ_LEN)
 
     train_tmp_indexes, test_indexes, label_train_tmp, label_test = train_test_split(dataset.indexs, dataset.labels,
                                                                                     test_size=0.1,
@@ -23,8 +25,6 @@ if __name__ == '__main__':
     print('Train Dataset: {}'.format(len(train_dataset)))
     print('Valid Dataset: {}'.format(len(val_dataset)))
     print('Test Dataset: {}'.format(len(test_dataset)))
-
-    config=Config()
 
     best_net = Train(train_dataset, val_dataset, config)
 

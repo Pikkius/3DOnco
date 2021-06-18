@@ -7,12 +7,14 @@ from torch.utils.data import Dataset
 
 class Protein(Dataset):
 
-    def __init__(self, root):
+    def __init__(self, root, seq_len):
 
         self.root = root
         self.prot_names = dict()
         self.labels = []
         self.indexs = []
+
+        self.seq_len = seq_len
 
         self.construct_labels()
 
@@ -36,9 +38,9 @@ class Protein(Dataset):
         features['matrix'] = pkl['dist']
 
         protein_len = features['ss'].shape[1]
-        if protein_len < 3000:
+        if protein_len < self.seq_len:
             features = self.padding(features)
-        if protein_len > 3000:
+        if protein_len > self.seq_len:
             features = self.crop(features, protein_len)
 
         fa_name = f'{self.root}/{name}/{name}.fa'  # fa_name=f'{path}/{name}/{name}.fa'
@@ -73,25 +75,23 @@ class Protein(Dataset):
                     self.labels.append(label)
                     f.close()
 
-    @staticmethod
-    def padding(features):
+    def padding(self, features):
         for key, value in features.items():
             if key == 'matrix':
-                features[key] = np.pad(value, ((0, 0), (0, 3000 - value.shape[1]), (0, 3000 - value.shape[2])))
+                features[key] = np.pad(value, ((0, 0), (0, self.seq_len - value.shape[1]), (0, self.seq_len - value.shape[2])))
             else:
-                features[key] = np.pad(value, ((0, 0), (0, 3000 - value.shape[1])))  # 1, dict, seq_len
+                features[key] = np.pad(value, ((0, 0), (0, self.seq_len - value.shape[1])))  # 1, dict, seq_len
         return features
 
-    @staticmethod
-    def crop(features, protein_len):
-        index_start = np.random.randint(0, protein_len - 3000)
+    def crop(self, features, protein_len):
+        index_start = np.random.randint(0, protein_len - self.seq_len)
         for key, value in features.items():
 
             if key == 'matrix':
-                features[key] = value[:, index_start:index_start+3000, index_start:index_start+3000]
+                features[key] = value[:, index_start:index_start+self.seq_len, index_start:index_start+self.seq_len]
 
             else:
-                features[key] = value[:, index_start:index_start+3000]
+                features[key] = value[:, index_start:index_start+self.seq_len]
 
         return features
 
