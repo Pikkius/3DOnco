@@ -20,6 +20,7 @@ class Protein(Dataset):
         self.construct_labels()
 
         for el in list(os.listdir(self.root)):
+
             key, value = el.split('_', 1)
             self.prot_names[key] = value
 
@@ -31,34 +32,28 @@ class Protein(Dataset):
         name = f'{index}_{self.prot_names[index]}'
         pkl = np.load(f'{self.root}/{name}/{name}_prediction.pkl', allow_pickle=True)
 
-        pkl['seq'] = self.create_sequence_matrix(pkl['seq'])
+        seq_tmp = self.create_sequence_matrix(pkl['seq'])
+        protein_len = seq_tmp.shape[1]
+        pieces=math.ceil(protein_len/self.seq_len)
 
-        protein_len = pkl['seq'].shape[1]
-        pieces = math.ceil(protein_len / self.seq_len)
-
-        features['matrix'] = np.zeros((pieces, *pkl['dist'].shape))
-        features['seq'] = np.zeros((pieces, *pkl['seq'].shape))
-
+        features['matrix'] = np.zeros((pieces, pkl['dist'].shape[0], self.seq_len, self.seq_len))
+        features['seq'] = np.zeros((pieces, seq_tmp.shape[0], self.seq_len))
         for piece in range(pieces):
-            if piece == pieces - 1:
-                block = pkl['dist'][:, piece * self.seq_len:, piece * self.seq_len:]
-                block = np.pad(block, ((0, 0), (0, self.seq_len - block.shape[2]), (0, self.seq_len - block.shape[3])))
+          if piece==pieces-1:
+            block=pkl['dist'][:,piece*self.seq_len:,piece*self.seq_len:]
+            block=np.pad(block, ((0, 0), (0, self.seq_len - block.shape[1]), (0, self.seq_len - block.shape[2])))
 
-            else:
-                block = pkl['dist'][:, piece * self.seq_len:(piece + 1) * self.seq_len,
-                                    piece * self.seq_len:(piece + 1) * self.seq_len]
-            features['matrix'][piece] = np.copy(block)
+          else:
+            block=pkl['dist'][:,piece*self.seq_len:(piece+1)*self.seq_len,piece*self.seq_len:(piece+1)*self.seq_len]
+          features['matrix'][piece] = np.copy(block)
 
-            if piece == pieces - 1:
-                block = pkl['seq'][:, piece * self.seq_len:]
-                block = np.pad(block, ((0, 0), (0, self.seq_len - block.shape[2])))
+          if piece==pieces-1:
+            block=seq_tmp[:,piece*self.seq_len:]
+            block=np.pad(block, ((0, 0), (0, self.seq_len - block.shape[1])))
 
-            else:
-                block = pkl['seq'][:, piece * self.seq_len:(piece + 1) * self.seq_len]
-            features['seq'][piece] = np.copy(block)
-
-        if protein_len > self.seq_len:
-            features = self.crop(features, protein_len)
+          else:
+            block=seq_tmp[:,piece*self.seq_len:(piece+1)*self.seq_len]
+          features['seq'][piece] = np.copy(block)
 
         fa_name = f'{self.root}/{name}/{name}.fa'  # fa_name=f'{path}/{name}/{name}.fa'
         with open(fa_name) as f:
@@ -80,8 +75,8 @@ class Protein(Dataset):
         for el in list(os.listdir(self.root)):
             el_fa = el + '/' + el + '.fa'
             el = el + '/' + el + '_prediction.pkl'  # 12_asd_Asd/12_asd_Asd_prediction.pkl
-
-            if os.path.isfile(self.root + '/' + el):
+            
+            if os.path.isfile(self.root+'/'+el):
                 self.indexs.append(el.split('_')[0])
                 with open(self.root + '/' + el_fa, 'r') as f:
                     header = str(f.readlines())
@@ -92,8 +87,7 @@ class Protein(Dataset):
     def padding(self, features):
         for key, value in features.items():
             if key == 'matrix':
-                features[key] = np.pad(value,
-                                       ((0, 0), (0, self.seq_len - value.shape[1]), (0, self.seq_len - value.shape[2])))
+                features[key] = np.pad(value, ((0, 0), (0, self.seq_len - value.shape[1]), (0, self.seq_len - value.shape[2])))
             else:
                 features[key] = np.pad(value, ((0, 0), (0, self.seq_len - value.shape[1])))  # 1, dict, seq_len
         return features
@@ -103,10 +97,10 @@ class Protein(Dataset):
         for key, value in features.items():
 
             if key == 'matrix':
-                features[key] = value[:, index_start:index_start + self.seq_len, index_start:index_start + self.seq_len]
+                features[key] = value[:, index_start:index_start+self.seq_len, index_start:index_start+self.seq_len]
 
             else:
-                features[key] = value[:, index_start:index_start + self.seq_len]
+                features[key] = value[:, index_start:index_start+self.seq_len]
 
         return features
 
