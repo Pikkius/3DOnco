@@ -3,6 +3,7 @@ import os
 
 import torch
 from torch.utils.data import Dataset
+import math
 
 
 class Protein(Dataset):
@@ -19,7 +20,6 @@ class Protein(Dataset):
         self.construct_labels()
 
         for el in list(os.listdir(self.root)):
-
             key, value = el.split('_', 1)
             self.prot_names[key] = value
 
@@ -31,15 +31,32 @@ class Protein(Dataset):
         name = f'{index}_{self.prot_names[index]}'
         pkl = np.load(f'{self.root}/{name}/{name}_prediction.pkl', allow_pickle=True)
 
-        features['seq'] = self.create_sequence_matrix(pkl['seq'])
-        features['ss'] = pkl['ss']
-        features['phi'] = pkl['phi']
-        features['psi'] = pkl['psi']
-        features['matrix'] = pkl['dist']
+        pkl['seq'] = self.create_sequence_matrix(pkl['seq'])
 
-        protein_len = features['ss'].shape[1]
-        if protein_len < self.seq_len:
-            features = self.padding(features)
+        protein_len = pkl['seq'].shape[1]
+        pieces = math.ceil(protein_len / self.seq_len)
+
+        features['matrix'] = np.zeros((pieces, *pkl['dist'].shape))
+        features['seq'] = np.zeros((pieces, *pkl['seq'].shape))
+
+        for piece in range(pieces):
+            if piece == pieces - 1:
+                block = pkl['dist'][:, piece * self.seq_len:, piece * self.seq_len:]
+                block = np.pad(block, ((0, 0), (0, self.seq_len - block.shape[2]), (0, self.seq_len - block.shape[3])))
+
+            else:
+                block = pkl['dist'][:, piece * self.seq_len:(piece + 1) * self.seq_len,
+                                    piece * self.seq_len:(piece + 1) * self.seq_len]
+            features['matrix'][piece] = np.copy(block)
+
+            if piece == pieces - 1:
+                block = pkl['seq'][:, piece * self.seq_len:]
+                block = np.pad(block, ((0, 0), (0, self.seq_len - block.shape[2])))
+
+            else:
+                block = pkl['seq'][:, piece * self.seq_len:(piece + 1) * self.seq_len]
+            features['seq'][piece] = np.copy(block)
+
         if protein_len > self.seq_len:
             features = self.crop(features, protein_len)
 
@@ -50,9 +67,6 @@ class Protein(Dataset):
             f.close()
 
         return (torch.tensor(features['seq'], dtype=torch.float),
-                torch.tensor(features['ss'], dtype=torch.float),
-                torch.tensor(features['phi'], dtype=torch.float),
-                torch.tensor(features['psi'], dtype=torch.float),
                 torch.tensor(features['matrix'], dtype=torch.float),
                 torch.tensor(label, dtype=torch.long))
 
@@ -66,8 +80,8 @@ class Protein(Dataset):
         for el in list(os.listdir(self.root)):
             el_fa = el + '/' + el + '.fa'
             el = el + '/' + el + '_prediction.pkl'  # 12_asd_Asd/12_asd_Asd_prediction.pkl
-            
-            if os.path.isfile(self.root+'/'+el):
+
+            if os.path.isfile(self.root + '/' + el):
                 self.indexs.append(el.split('_')[0])
                 with open(self.root + '/' + el_fa, 'r') as f:
                     header = str(f.readlines())
@@ -78,7 +92,8 @@ class Protein(Dataset):
     def padding(self, features):
         for key, value in features.items():
             if key == 'matrix':
-                features[key] = np.pad(value, ((0, 0), (0, self.seq_len - value.shape[1]), (0, self.seq_len - value.shape[2])))
+                features[key] = np.pad(value,
+                                       ((0, 0), (0, self.seq_len - value.shape[1]), (0, self.seq_len - value.shape[2])))
             else:
                 features[key] = np.pad(value, ((0, 0), (0, self.seq_len - value.shape[1])))  # 1, dict, seq_len
         return features
@@ -88,10 +103,10 @@ class Protein(Dataset):
         for key, value in features.items():
 
             if key == 'matrix':
-                features[key] = value[:, index_start:index_start+self.seq_len, index_start:index_start+self.seq_len]
+                features[key] = value[:, index_start:index_start + self.seq_len, index_start:index_start + self.seq_len]
 
             else:
-                features[key] = value[:, index_start:index_start+self.seq_len]
+                features[key] = value[:, index_start:index_start + self.seq_len]
 
         return features
 
