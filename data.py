@@ -33,8 +33,6 @@ class Protein(Dataset):
 
         features['seq'] = self.create_sequence_matrix(pkl['seq'])
         features['ss'] = pkl['ss']
-        features['phi'] = pkl['phi']
-        features['psi'] = pkl['psi']
         features['matrix'] = pkl['dist']
 
         protein_len = features['ss'].shape[1]
@@ -42,6 +40,10 @@ class Protein(Dataset):
             features = self.padding(features)
         if protein_len > self.seq_len:
             features = self.crop(features, protein_len)
+        
+        features['dist_bin'] = np.zeros_like(features['matrix'][0])
+        for i in range(10):
+            features['dist_bin'] += pkl['dist_bin_map'][i]*features['matrix'][i]
 
         fa_name = f'{self.root}/{name}/{name}.fa'  # fa_name=f'{path}/{name}/{name}.fa'
         with open(fa_name) as f:
@@ -50,10 +52,7 @@ class Protein(Dataset):
             f.close()
 
         return (torch.tensor(features['seq'], dtype=torch.float),
-                torch.tensor(features['ss'], dtype=torch.float),
-                torch.tensor(features['phi'], dtype=torch.float),
-                torch.tensor(features['psi'], dtype=torch.float),
-                torch.tensor(features['matrix'], dtype=torch.float),
+                torch.tensor(features['dist_bin'], dtype=torch.float),
                 torch.tensor(label, dtype=torch.long))
 
     def __len__(self):

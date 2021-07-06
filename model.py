@@ -11,15 +11,15 @@ class model_3DOnco(torch.nn.Module):
         super(model_3DOnco, self).__init__()
         self.mode = mode
         if mode == 'linear':
-            self.seq_feature = [seq_linear(inputs_voc[i], seq_len, hidden_dim) for i in range(4)]
+            self.seq_feature = seq_linear(inputs_voc[0], seq_len, hidden_dim)
         elif mode == 'conv':
-            self.seq_feature = [seq_conv(inputs_voc[i], hidden_dim) for i in range(4)]
+            self.seq_feature = seq_conv(inputs_voc[0], hidden_dim)
 
         # [batch, bins, seq, seq]
         # [(W−K+2P)/S]+1
         # W = 3000, K = 7, P = 2, S = 4
         self.dist_feature = torch.nn.Sequential(
-            torch.nn.Conv2d(inputs_voc[-1], hidden_dim * 2, stride=4, padding=2, kernel_size=7, bias=False),
+            torch.nn.Conv2d(1, hidden_dim * 2, stride=4, padding=2, kernel_size=7, bias=False),
             # [batch, hidden_dim*2, seq*, seq*
             torch.nn.BatchNorm2d(hidden_dim * 2),
             torch.nn.ReLU(inplace=True),
