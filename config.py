@@ -1,6 +1,8 @@
 import os
 import json
 from datetime import datetime
+import shutil
+
 
 
 class Config:
@@ -29,7 +31,9 @@ class Config:
             self.load_config(dictionay)
         if self.out_dir is None:
             setattr(self, 'out_dir', datetime.now().strftime("%d_%b_%Y_%H"))
-            os.mkdir(self.out_dir)
+            if os.path.exists(self.out_dir):
+                shutil.rmtree(self.out_dir)
+            os.makedirs(self.out_dir)
 
     def __getitem__(self, item):
         return getattr(self, item)

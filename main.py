@@ -18,6 +18,13 @@ if __name__ == '__main__':
     train_indexes, val_indexes, label_train, label_val = train_test_split(train_tmp_indexes, label_train_tmp,
                                                                           test_size=0.2, stratify=label_train_tmp)
 
+    config.LR = 0.008
+    config.STEP_SIZE = 5
+
+    config.BATCH_SIZE = 1
+    config.LOG_FREQUENCY = 12
+    config.DEVICE = 'cuda'
+
     train_dataset = Subset(dataset, train_indexes)
     val_dataset = Subset(dataset, val_indexes)
     test_dataset = Subset(dataset, test_indexes)

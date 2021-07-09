@@ -7,13 +7,16 @@ def conv_out_len(W, K, P, S):
 
 class model_3DOnco(torch.nn.Module):
 
-    def __init__(self, mode, inputs_voc, hidden_dim, seq_len):
+    def __init__(self, hidden_dim, seq_len, mode=None, inputs_voc=None):
         super(model_3DOnco, self).__init__()
         self.mode = mode
-        if mode == 'linear':
-            self.seq_feature = seq_linear(inputs_voc[0], seq_len, hidden_dim)
-        elif mode == 'conv':
-            self.seq_feature = seq_conv(inputs_voc[0], hidden_dim)
+        if mode is not None:
+            if inputs_voc is None:
+                raise ValueError("input_voc cannot be None")
+            if mode == 'linear':
+                self.seq_feature = seq_linear(inputs_voc[0], seq_len, hidden_dim)
+            elif mode == 'conv':
+                self.seq_feature = seq_conv(inputs_voc[0], hidden_dim)
 
         # [batch, bins, seq, seq]
         # [(W−K+2P)/S]+1
@@ -35,7 +38,7 @@ class model_3DOnco(torch.nn.Module):
             torch.nn.Dropout()
         )
         self.dist_linear_1d = torch.nn.Sequential(
-            torch.nn.Linear(hidden_dim * 4 * out_conv, hidden_dim * 8),
+            torch.nn.Linear(hidden_dim * 8 * hidden_dim * 125, hidden_dim * 8),
             torch.nn.ReLU(inplace=True),
             torch.nn.Dropout()
         )
@@ -46,42 +49,31 @@ class model_3DOnco(torch.nn.Module):
         )
 
         self.classifier = torch.nn.Sequential(
-            torch.nn.Linear(hidden_dim * 16 * hidden_dim * 5, hidden_dim * 4),
+            torch.nn.Linear(hidden_dim * 8, hidden_dim * 4),
             torch.nn.ReLU(inplace=True),
             torch.nn.Linear(hidden_dim * 4, 2),
             torch.nn.Softmax(dim=1)
         )
 
-    def to(self, device):
-      super(model_3DOnco, self).to(device)
-      for i in range(len(self.seq_feature)):
-        self.seq_feature[i] = self.seq_feature[i].to(device)
-      return self
-
-    def train(self, flag=True):
-      super(model_3DOnco, self).train(flag)
-      for i in range(len(self.seq_feature)):
-        self.seq_feature[i] = self.seq_feature[i].train(flag)
-      return self
-
     def forward(self, x):
         # [feature, batch, vocab, seq_len]
-        out_seq = []
-        for i in range(len(x) - 1):
-            out_seq.append(self.seq_feature[i](x[i]).unsqueeze(0))
+        if self.mode is not None:
+            out_seq = self.seq_feature(x)
 
-        out_seq = torch.cat(out_seq)
-        out_seq = out_seq.transpose(1, 0)  # [batch, feature, seq_len, vocab]
-        out_seq = self.seq_linear(out_seq)
+            out_seq = out_seq.transpose(1, 0)  # [batch, feature, seq_len, vocab]
+            out_seq = self.seq_linear(out_seq)
 
-        out_dist = self.dist_feature(x[-1])  # [batch, vocab, seq, seq]
+        out_dist = self.dist_feature(x[-1].view(x[-1].size(0),1,x[-1].size(-1), x[-1].size(-1)))  # [batch, vocab, seq, seq]
         out_dist = self.dist_linear_2d(out_dist)  # [batch, vocab, seq, seq]
-        out_dist = out_dist.view(out_dist.size(0), out_dist.size(1), -1)  # [batch, seq * seq * vacab]
+        out_dist = out_dist.view(out_dist.size(0), -1)  # [batch, seq * seq * vacab]
         out_dist = self.dist_linear_1d(out_dist)
 
         # reunion
+        if self.mode is None:
+            out = out_dist.unsqueeze(1)  # [batch, feature, seq_len, vocab]
 
-        out = torch.cat([out_seq, out_dist.unsqueeze(1)], dim=1)  # [batch, feature, seq_len, vocab]
+        else:
+            out = torch.cat([out_seq, out_dist.unsqueeze(1)], dim=1)  # [batch, feature, seq_len, vocab]
 
         out = self.classifier(out.view(out_dist.size(0), -1))
 

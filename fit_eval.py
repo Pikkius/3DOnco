@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-from treDOnco.model import model_3DOnco
+from model import model_3DOnco
 
 import copy
 from torch.utils.data import DataLoader
@@ -16,7 +16,7 @@ def Train(train_set, val_set, config):
     train_dataloader = DataLoader(train_set, batch_size=config.BATCH_SIZE, shuffle=True, num_workers=0, drop_last=False)
     val_dataloader = DataLoader(val_set, batch_size=config.BATCH_SIZE, shuffle=False, num_workers=0, drop_last=False)
 
-    net = model_3DOnco('conv', config.inputs_voc, config.hidden_dim, config.SEQ_LEN)
+    net = model_3DOnco(config.hidden_dim, config.SEQ_LEN)
     net = net.to(config.DEVICE)
 
     criterion = nn.CrossEntropyLoss()
@@ -44,7 +44,7 @@ def Train(train_set, val_set, config):
 
         for x in train_dataloader:
             # Bring data over the device of choice
-            x = [x[i].to(config.DEVICE) for i in range(len(x))]
+            x = [x[i].to(config.DEVICE, ) for i in range(len(x))]
 
             # Forward pass to the network
             outputs = net(x[:-1])  # features dim = [batch, vocab, seq_len, (seq)]
@@ -124,7 +124,7 @@ def Test(test_set, model, batch):
     return evaluation(model, test_dataloader)
 
 
-def evaluation(model, dataset, criterion=None, device='cpu'):
+def evaluation(model, dataset, criterion=None, device='cuda'):
     model.train(False)  # Set Network to evaluation mode
     running_corrects = 0
     tot_loss = 0
