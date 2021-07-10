@@ -7,6 +7,7 @@ Model for Onco prediction using 3D protein structure
 - [Gene Fusion](#Gene)
 - [Protein Structure Prediction](#psp)
   - [HHBlits](#hhblits)
+  - [plmDCA](#plmdca)
   - [ProSPr](#prospr)
 - [Models](#models)
 - [Results](#results)
@@ -35,9 +36,9 @@ HHBlits is one of the most important tools to generate multiple sequence alignme
 After creating the HMM, the HHBlits server iteratively searches through an HMM database - in our case, UniProt30: it looks for the sequences with an expected value (_E_ value) below a certain threshold and it adds them to the query MSA, from which the HMM for the next search iteration is built. 
 
 
-HHBlits is a very fast and sensitive ralgorithm thanks to a two-stage prefilter phase that reduces the number of database HMMs to be aligned. 
+HHBlits is a very fast and sensitive algorithm thanks to a two-stage prefilter phase that reduces the number of database HMMs to be aligned. 
 
-
+## plmDCA <a name="plmdca"></a>
 
 ## ProSPr <a name="prospr"></a>
 
