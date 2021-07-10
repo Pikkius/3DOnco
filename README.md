@@ -7,7 +7,7 @@ Model for Onco prediction using 3D protein structure
 - [Gene Fusion](#Gene)
 - [Protein Structure Prediction](#psp)
   - [HHBlits](#hhblits)
-  - [plmDCA](#plmdca)
+  - [DCA](#dca)
   - [ProSPr](#prospr)
 - [Models](#models)
 - [Results](#results)
@@ -18,6 +18,16 @@ Model for Onco prediction using 3D protein structure
 # Data <a name="Data"></a>
 
 # Gene Fusion <a name="Gene"></a>
+
+Gene fusions are specific kind of aberrations that happen when parts of two different genes join together. Fusion proteins resulting from the expression of these genes may lead to the development of different pathologies, especially cancers. 
+
+An heukaryotic gene is characterised by different areas: the ones of interest for our study are the coding sequences which are the regions that are then transcribed into RNA and translated into proteins. Moreover, a single gene can produce multiple different RNAs that are called _transcripts_ and, for each gene, we consider one single transcript that is the longest one; if two transcripts have the same length, than we consider the one with the highest number of coding sequences. **verificare questa cosa**
+
+Building gene fusions sequences requires to consider two important things:
+* if we are dealing with the 5' gene (first gene of the fusion) or the 3' gene (second gene of the fusion)
+* it the gene transcribes in the + or in the - strand
+
+If we consider the 5' gene and it transcribes in the + strand or the 3' gene that transcribes in the - strand, the portion of the gene that preceeds the breakpoint is selected; on the other hand, if we consier the 5' gene that transcribes in the - strand or the 5+ gene that transcribes in the + strand, we take the portion of the gene that follows the breakpoint. Another important thing to takes into account is that the final sequences of genes that transcribe in the - strand must be reversed and the bases must be substituted with their complementaries. 
 
 # Protein Structure Prediction <a name="psp"></a>
 
@@ -38,7 +48,8 @@ After creating the HMM, the HHBlits server iteratively searches through an HMM d
 
 HHBlits is a very fast and sensitive algorithm thanks to a two-stage prefilter phase that reduces the number of database HMMs to be aligned. 
 
-## plmDCA <a name="plmdca"></a>
+## Direct-Coupling Analysis <a name="dca"></a>
+The alignment results produced with HHBlits are then used to fit a statistical model called Direct-Coupling Analysis (DCA). 
 
 ## ProSPr <a name="prospr"></a>
 
