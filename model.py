@@ -38,7 +38,7 @@ class model_3DOnco(torch.nn.Module):
             torch.nn.Dropout()
         )
         self.dist_linear_1d = torch.nn.Sequential(
-            torch.nn.Linear(hidden_dim * 2 * hidden_dim * 4 * hidden_dim * 4, hidden_dim * 8),
+            torch.nn.Linear(hidden_dim * hidden_dim * seq_len, hidden_dim * 8),
             torch.nn.ReLU(inplace=True),
             torch.nn.Dropout()
         )
@@ -65,6 +65,7 @@ class model_3DOnco(torch.nn.Module):
 
         out_dist = self.dist_feature(x[-1].view(x[-1].size(0),1,x[-1].size(-1), x[-1].size(-1)))  # [batch, vocab, seq, seq]
         out_dist = self.dist_linear_2d(out_dist)  # [batch, vocab, seq, seq]
+        print(out_dist.shape)
         out_dist = out_dist.view(out_dist.size(0), -1)  # [batch, seq * seq * vacab]
         out_dist = self.dist_linear_1d(out_dist)
 
