@@ -38,7 +38,7 @@ class model_3DOnco(torch.nn.Module):
             torch.nn.Dropout()
         )
         self.dist_linear_1d = torch.nn.Sequential(
-            torch.nn.Linear(hidden_dim * 8 * hidden_dim * 125, hidden_dim * 8),
+            torch.nn.Linear(hidden_dim * 2 * hidden_dim * 4 * hidden_dim * 4, hidden_dim * 8),
             torch.nn.ReLU(inplace=True),
             torch.nn.Dropout()
         )
