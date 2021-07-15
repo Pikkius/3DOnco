@@ -77,9 +77,9 @@ class Protein(Dataset):
     def padding(self, features):
         for key, value in features.items():
             if key == 'matrix':
-                features[key] = np.pad(value, ((0, 0), (0, self.seq_len - value.shape[1]), (0, self.seq_len - value.shape[2])))
+                features[key] = np.pad(value, ((0, 0), (0, self.seq_len - value.shape[1]), (0, self.seq_len - value.shape[2])), constant_values=(-55,-55))
             else:
-                features[key] = np.pad(value, ((0, 0), (0, self.seq_len - value.shape[1])))  # 1, dict, seq_len
+                features[key] = np.pad(value, ((0, 0), (0, self.seq_len - value.shape[1])), constant_values=(-55,-55))  # 1, dict, seq_len
         return features
 
     def crop(self, features, protein_len):
