@@ -16,18 +16,100 @@ Model for Onco prediction using 3D protein structure
 ---
 
 # Data <a name="Data"></a>
+BLA BLA
+BLA
+BLA
+BLA 
+NON SO 
 
 # Gene Fusion <a name="Gene"></a>
 
-Gene fusions are specific kind of aberrations that happen when parts of two different genes join together. Fusion proteins resulting from the expression of these genes may lead to the development of different pathologies, especially cancers. 
+# Theory
+Gene fusions are specific kind of aberrations that happen when parts of two different genes join together as result of a translocation, interstitial deletion or chromosomal inversion. Fusion proteins resulting from the expression of these hybrid genes may lead to the development of different pathologies, especially cancers: in this case the gene under analysis is defined as 'Oncogene'.
 
-An heukaryotic gene is characterised by different areas: the ones of interest for our study are the coding sequences which are the regions that are then transcribed into RNA and translated into proteins. Moreover, a single gene can produce multiple different RNAs that are called _transcripts_ and, for each gene, we consider one single transcript that is the longest one; if two transcripts have the same length, than we consider the one with the highest number of coding sequences. **verificare questa cosa**
+In this scenario, the coordinates of the base pair at which the 2 genes are fused together is called breakpoint, so we refer to the gene BEFORE the break point as <b>5' gene </b> and to the gene AFTER the break point as <b>3' gene </b>.
+
+An eukaryotic gene is characterised by different areas:
+
+https://www.researchgate.net/figure/An-illustration-of-a-typical-structure-of-a-eukaryotic-gene-A-gene-may-have-many_fig3_51510353 
+
+the ones of interest for our study are the coding DNA sequences (CDS) which are the regions that are transcribed into RNA and translated into proteins. Moreover, a single gene can produce multiple different RNAs due to splicig procedure (?) that are called _transcripts_ and, for each gene, we consider one single transcript that is the longest one; also, if two transcripts have the same length, than we consider the one with the highest number of coding sequences. 
 
 Building gene fusions sequences requires to consider two important things:
 * if we are dealing with the 5' gene (first gene of the fusion) or the 3' gene (second gene of the fusion)
-* it the gene transcribes in the + or in the - strand
+* it the gene transcribes in the + or in the - strand. In this case the - strand must be reversed and the bases must be substituted with their complementaries, since the databases contain only + strand genes.
 
-If we consider the 5' gene and it transcribes in the + strand or the 3' gene that transcribes in the - strand, the portion of the gene that preceeds the breakpoint is selected; on the other hand, if we consier the 5' gene that transcribes in the - strand or the 5+ gene that transcribes in the + strand, we take the portion of the gene that follows the breakpoint. Another important thing to takes into account is that the final sequences of genes that transcribe in the - strand must be reversed and the bases must be substituted with their complementaries. 
+With 2 genes and 2 signs this leads to 4 different cases: 
+IMMA
+
+
+If we consider the 5' gene and it transcribes in the + strand, or the 3' gene that transcribes in the - strand, the portion of the gene that preceeds the breakpoint is selected. (FAcciamo uno schemino??)
+
+On the other hand, if we consier the 5' gene that transcribes in the - strand or the 5+ gene that transcribes in the + strand, we take the portion of the gene that follows the breakpoint.  (Anche qui??)
+
+Moreover we have to take into account the position of the break points. 
+
+If the break point is inside a CDS for both the genes the transcripts are merged together based on the previous rules.
+
+But we need to be more carefull if the break point is inside an exon or inside an Untranslated Region (UTR):
+SCHEMA
+
+5' gene transcribes with + sign 
+
+bp into an exon we should stop the transcription of this gene at the preceding CDS.
+
+5' UTR --> NULL
+3' UTR --> GENE COMPLETE
+
+5' gene transcribes with - sign 
+
+bp into an exon we should stop the transcription of this gene at the following CDS. (perchè stiamo sempre leggendo sul + strand)
+
+5' UTR --> GENE COMPLETE
+3' UTR --> NULL
+
+3' gene transcribes with + sign 
+
+bp into an exon we should start the transcription of this gene at the following CDS.
+
+5' UTR --> 
+3' UTR --> 
+
+3' gene transcribes with - sign 
+
+bp into an exon we should start the transcription of this gene at the preceding CDS. (perchè stiamo sempre leggendo sul + strand)
+
+5' UTR --> 
+3' UTR --> 
+
+FINE SCHEMA
+
+#FUNCTION
+(Implemented on Colab gli diamo qualche specifica?)
+#FILTER GENOME
+
+Firstly we need to filter the human genome, to do so we implemented Gene_Fusion.ipyn that takes in input a gtf file which contains all the genome annotated. The algorithm filter the data considering the ensembl notation and gives as result a correspondence one to one between a gene and its transcript. Since one gene can be associated to more tha one transcript due to splicing mechanims in this case we selected the transcript that contains more CDS.
+At the end the results is ordered by chromosomes and stored in a csv.
+The ipyn takes as input argument the version of the annotation, for semplicity we had already runned the file using GRCH37 and GRCH38. The csv results are inside the folder (NON LO SO), so you don't have to run again this part. For future updatings the time of run is about 20 minutues (di più). GRCH files can be downloaded at LINK
+
+ESEMPIO PER GLI SCEMI ---> ADELA
+
+#GENE FUSION
+
+We prepared a function to simulate gene fusion in Gene_fusion_Andre.ipyn.
+The script takes as input 2 chromosome and 2 break points and then simulate the gene fusion. The first pair is associated to the 5' gene and the second one to the 3' gene.
+Moreover, the code to run need the gtf files for all the 48 chromosome and the csv file generated in the previous point. You can download the files from LINKS
+
+SCRIVO COME FUNZIONA (?)
+
+The function gives as ouput a fasta file that contains the protein generated by the fusion. Moreover in the 
+
+( Another important thing to takes into account is that the final sequences of genes that transcribe in the - strand must be reversed and the bases must be substituted with their complementaries. lo metterei su )
+
+Our model .... spiega modello 
+input 
+output 
+
 
 # Protein Structure Prediction <a name="psp"></a>
 
