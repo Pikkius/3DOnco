@@ -36,9 +36,10 @@ Gene fusions are specific kind of aberrations that happen when parts of two diff
 
 In this scenario, the coordinates of the base pair at which the 2 genes are fused together is called breakpoint, so we refer to the gene BEFORE the break point as <b>5' gene </b> and to the gene AFTER the break point as <b>3' gene </b>.
 
-An eukaryotic gene is characterised by different areas:
+An eukaryotic transcript is characterised by different areas:
+![eukariotc transcript](https://s3-us-west-2.amazonaws.com/courses-images/wp-content/uploads/sites/198/2016/11/23232432/Figure_15_03_02.png)
+    
 
-https://www.researchgate.net/figure/An-illustration-of-a-typical-structure-of-a-eukaryotic-gene-A-gene-may-have-many_fig3_51510353 
 
 the ones of interest for our study are the coding DNA sequences (CDS) which are the regions that are transcribed into RNA and translated into proteins. Moreover, a single gene can produce multiple different RNAs due to splicig procedure (?) that are called _transcripts_ and, for each gene, we consider one single transcript that is the longest one; also, if two transcripts have the same length, than we consider the one with the highest number of coding sequences. 
 
@@ -58,7 +59,7 @@ Moreover we have to take into account the position of the break points.
 
 If the break point is inside a CDS for both the genes the transcripts are merged together based on the previous rules.
 
-But we need to be more carefull if the break point is inside an exon or inside an Untranslated Region (UTR):
+But we need to be more carefull if the break point is inside an intron or inside an Untranslated Region (UTR):
 SCHEMA
 
 5' gene transcribes with + sign 
