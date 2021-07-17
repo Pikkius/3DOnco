@@ -105,7 +105,8 @@ But we need to be more carefull if the break point is inside an intron or inside
 
 #FUNCTION
 (Implemented on Colab gli diamo qualche specifica?)
-#FILTER GENOME
+
+##FILTER GENOME
 
 Firstly we need to filter the human genome, to do so we implemented `Gene_Fusion.ipyn` that takes in input a gtf file which contains all the genome annotated. The algorithm filter the data considering the ensembl notation and gives as result a correspondence one to one between a gene and its transcript. Since one gene can be associated to more tha one transcript due to splicing mechanims in this case we selected the transcript that contains more CDS.
 At the end the results is ordered by chromosomes and stored in a csv.
@@ -113,7 +114,7 @@ The ipyn takes as input argument the version of the annotation, for semplicity w
 
 ESEMPIO PER GLI SCEMI ---> ADELA
 
-#GENE FUSION
+##GENE FUSION
 
 We prepared a function to simulate gene fusion in Gene_fusion_Andre.ipyn.
 The script takes as input 2 chromosome and 2 break points and then simulate the gene fusion. The first pair is associated to the 5' gene and the second one to the 3' gene.
