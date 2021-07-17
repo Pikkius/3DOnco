@@ -252,14 +252,38 @@ On average a protein to complete the HHBlist and Propspr takes 3 hours
 # TDA
 Now that we have the matrix, we want to be sure that they contains significant pattern for the classification.
 # Models <a name="models"></a>
-
+## Neural Network
 Rete CONV
 LSTM
 
 a 10 e 1 canale
+## Random Forest
+Random forest is a an ensemble machine learning technique that can be exploited both for classification and regression.
+The algorithm consists in many decision trees that predict indipendently and then vote for the result.
+[rf]()
 
-RANDOM FOREST
+### Matrix analysis
+For semplicity we transform the 10 channels matrix into a 1 channel matrix, exploiting the code used for visualize it. 
 
+Furthermore, the standard preprocessing is applied so sequences are elongated or cropped in order to achieve the same length of 1000 aa. (lo spieghiamo su)
+
+
+Then the script takes in input the matrix and ,after vectorizing it, perform a gridsearch CV with these parameters:
+```
+'criterion': ["gini", "entropy"]
+'max_features': ["auto", "sqrt", "log2"]
+'random_state': [1]
+'bootstrap': [True, False]
+```
+### Sequence analysis
+
+The same procedure is now proposed using just the protein sequence, so we can see if passing through the 3d structure has lead to an improving of the performances.
+
+Firsly we need to encode the sequences into a [one hot encoding form](https://pdfs.semanticscholar.org/8aeb/ecf42891c94bdddd4eabb1ad5ae0e6700281.pdf?_ga=2.171528992.1835270510.1626557090-1170679748.1626189564).
+
+DISEGNINO MARTA 
+
+Then we finetuning the algorithm in the same way.
 # Results <a name="results"></a>
 
 
