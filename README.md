@@ -30,7 +30,7 @@
 
 # Data <a name="Data"></a>
 
-![gene_fusion](Figures/Gene_fusion.PNG)
+![gene_fusion](Figures/Gene_fusion.PNG =250x)
 
 For this purpose we used data from [DEEPrior](https://github.com/bioinformatics-polito/DEEPrior), which are contain in a csv file that for each fusion pair contain:
 * Name of the fusion pair
