@@ -11,18 +11,21 @@
 
 # 3DOnco - An oncogenic fusion prediction tool (Adi is editing)
 
-<b>The tool is a gene fusion classification algorithm for onco and not onco protein: starting from 2 chromosomes and their breakpoints the tool simulates the gene fusion and then predicts the nature of the hybrid protein as oncogenic or not (non è il gene che è oncogenic?) through its 3d structure. </b>
+<b>The tool is a gene fusion classification algorithm for onco and not onco proteins: starting from 2 chromosomes and their break-points the tool simulates the gene fusion and then predicts the nature of the hybrid protein as oncogenic or not (non è il gene che è oncogenic?) through its 3d structure. </b>
 
 
 # Table of Contents
 
 - [Data](#Data)
 - [Gene Fusion](#Gene)
+  - [Theory](#theory)
+  - [Class](#class)
 - [Protein Structure Prediction](#psp)
   - [HHBlits](#hhblits)
-  - [DCA](#dca)
   - [ProSPr](#prospr)
 - [Models](#models)
+  - [Neural Network](#nn)
+  - [Random Forest](#rf)
 - [Results](#results)
 
 
@@ -45,7 +48,7 @@ Conta quanti sono per classe
 Mettiamo la distribuzione delle lunghezze ?
 # Gene Fusion <a name="Gene"></a>
 
-## Theory
+## Theory <a name="theory"></a>
 Gene fusions are specific kind of aberrations that happen when parts of two different genes join together as result of a translocation, interstitial deletion or chromosomal inversion. Fusion proteins resulting from the expression of these hybrid genes may lead to the development of different pathologies, especially cancers: in this case the gene under analysis is defined as 'Oncogene'.
 
 In this scenario, the coordinates of the base pair at which the 2 genes are fused together is called breakpoint, so we refer to the gene BEFORE the break point as <b>5' gene </b> and to the gene AFTER the break point as <b>3' gene </b>.
@@ -249,15 +252,15 @@ In particular, in this version the DCA analysis is substituted with a simpler on
 
 
 On average a protein to complete the HHBlist and Propspr takes 3 hours
-# TDA
+# TDA <a name="tda"></a>
 Now that we have the matrix, we want to be sure that they contains significant pattern for the classification.
 # Models <a name="models"></a>
-## Neural Network
+## Neural Network <a name="nn"></a>
 Rete CONV
 LSTM
 
 a 10 e 1 canale
-## Random Forest
+## Random Forest <a name="rf"></a>
 Random forest is a an ensemble machine learning technique that can be exploited both for classification and regression.
 The algorithm consists in many decision trees that predict indipendently and then vote for the result.
 [rf]()
