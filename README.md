@@ -13,6 +13,7 @@
 
 <b>The tool is a gene fusion classification algorithm for onco and not onco proteins: starting from 2 chromosomes and their break-points the tool simulates the gene fusion and then predicts the nature of the hybrid protein as oncogenic or not (non è il gene che è oncogenic?) through its 3d structure. </b>
 
+![gene_fusion](Figures/Gene_fusion.PNG)
 
 # Table of Contents
 
@@ -33,7 +34,6 @@
 
 # Data <a name="Data"></a>
 
-![gene_fusion](Figures/Gene_fusion.PNG)
 
 For this purpose we used data from [DEEPrior](https://github.com/bioinformatics-polito/DEEPrior), which are contain in a csv file that for each fusion pair contain:
 * Name of the fusion pair
