@@ -1,3 +1,14 @@
+# TO DO LIST
+- Tunare le reti (?)
+- Uniformare input reti ad solo channel matrix e optional seq
+- Schemini genefusion nel ReadMe
+- Creazione classe genefusion
+- Merge dei vari branch
+- Runnare experiments
+- Schematizzare i results nel ReadMe
+- Spiegare le reti utilizzate nel ReadMe
+
+
 # 3DOnco - An oncogenic fusion prediction tool (Adi is editing)
 
 Starting from 2 chromosomes and their breakpoints the tool simulates the gene fusion and then predicts the nature of the hybrid protein as oncogenic or not (non è il gene che è oncogenic?) through its 3d structure.
