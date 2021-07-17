@@ -30,7 +30,7 @@
 
 # Data <a name="Data"></a>
 
-![gene_fusion](Figures/Gene_fusion.PNG =250x)
+![gene_fusion](Figures/Gene_fusion.PNG)
 
 For this purpose we used data from [DEEPrior](https://github.com/bioinformatics-polito/DEEPrior), which are contain in a csv file that for each fusion pair contain:
 * Name of the fusion pair
@@ -61,7 +61,7 @@ Building gene fusions sequences requires to consider two important things:
 * it the gene transcribes in the + or in the - strand. In this case the - strand must be reversed and the bases must be substituted with their complementaries, since the databases contain only + strand genes.
 
 With 2 genes and 2 signs this leads to 4 different cases: 
-![cases](Figures/cases.PNG)
+![cases](Figures/CASES.PNG)
 
 If we consider the 5' gene and it transcribes in the + strand, or the 3' gene that transcribes in the - strand, the portion of the gene that preceeds the breakpoint is selected. (FAcciamo uno schemino??)
 
