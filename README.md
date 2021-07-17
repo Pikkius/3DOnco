@@ -45,7 +45,7 @@ Conta quanti sono per classe
 Mettiamo la distribuzione delle lunghezze ?
 # Gene Fusion <a name="Gene"></a>
 
-# Theory
+## Theory
 Gene fusions are specific kind of aberrations that happen when parts of two different genes join together as result of a translocation, interstitial deletion or chromosomal inversion. Fusion proteins resulting from the expression of these hybrid genes may lead to the development of different pathologies, especially cancers: in this case the gene under analysis is defined as 'Oncogene'.
 
 In this scenario, the coordinates of the base pair at which the 2 genes are fused together is called breakpoint, so we refer to the gene BEFORE the break point as <b>5' gene </b> and to the gene AFTER the break point as <b>3' gene </b>.
@@ -102,11 +102,12 @@ But we need to be more carefull if the break point is inside an intron or inside
 * bp into 3' UTR --> Complete Gene
 
 
+## FUNCTION
 
-#FUNCTION
 (Implemented on Colab gli diamo qualche specifica?)
 
-##FILTER GENOME
+## Filter Genome
+
 
 Firstly we need to filter the human genome, to do so we implemented `Gene_Fusion.ipyn` that takes in input a gtf file which contains all the genome annotated. The algorithm filter the data considering the ensembl notation and gives as result a correspondence one to one between a gene and its transcript. Since one gene can be associated to more tha one transcript due to splicing mechanims in this case we selected the transcript that contains more CDS.
 At the end the results is ordered by chromosomes and stored in a csv.
@@ -114,7 +115,8 @@ The ipyn takes as input argument the version of the annotation, for semplicity w
 
 ESEMPIO PER GLI SCEMI ---> ADELA
 
-##GENE FUSION
+## Gene Fusion
+
 
 We prepared a function to simulate gene fusion in Gene_fusion_Andre.ipyn.
 The script takes as input 2 chromosome and 2 break points and then simulate the gene fusion. The first pair is associated to the 5' gene and the second one to the 3' gene.
