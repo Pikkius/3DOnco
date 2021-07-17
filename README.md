@@ -96,7 +96,7 @@ FINE SCHEMA
 (Implemented on Colab gli diamo qualche specifica?)
 #FILTER GENOME
 
-Firstly we need to filter the human genome, to do so we implemented Gene_Fusion.ipyn that takes in input a gtf file which contains all the genome annotated. The algorithm filter the data considering the ensembl notation and gives as result a correspondence one to one between a gene and its transcript. Since one gene can be associated to more tha one transcript due to splicing mechanims in this case we selected the transcript that contains more CDS.
+Firstly we need to filter the human genome, to do so we implemented `Gene_Fusion.ipyn` that takes in input a gtf file which contains all the genome annotated. The algorithm filter the data considering the ensembl notation and gives as result a correspondence one to one between a gene and its transcript. Since one gene can be associated to more tha one transcript due to splicing mechanims in this case we selected the transcript that contains more CDS.
 At the end the results is ordered by chromosomes and stored in a csv.
 The ipyn takes as input argument the version of the annotation, for semplicity we had already runned the file using GRCH37 and GRCH38. The csv results are inside the folder (NON LO SO), so you don't have to run again this part. For future updatings the time of run is about 20 minutues (di più). GRCH files can be downloaded [here](https://grch37.ensembl.org/info/data/ftp/index.html)
 
@@ -130,9 +130,11 @@ Also information about the nature of the fusion are stored:
 
 Example: (come si mette un riquadro?)
 
-'nome': '1_TMPRSS2_ERG', 'Label': 1, 'Chr5p': '21', 'Coord5p': 42870046, '5pEnsg': 'ENSG00000184012', '5pStrand': '-', 'Chr3p': '21', 'Coord3p': 39795483, '3pEnsg': 'ENSG00000157554', '3pStrand': '-', 'shift_5': 0, 'shift_3': 1, 'shift_tot': 1, 'flag_end_codon': 1
+```
+>'nome': '1_TMPRSS2_ERG', 'Label': 1, 'Chr5p': '21', 'Coord5p': 42870046, '5pEnsg': 'ENSG00000184012', '5pStrand': '-', 'Chr3p': '21', 'Coord3p': 39795483, '3pEnsg': 'ENSG00000157554', '3pStrand': '-', 'shift_5': 0, 'shift_3': 1, 'shift_tot': 1, 'flag_end_codon': 1
 
- MALNSELS
+MALNSELS 
+```
 
 
 
@@ -172,11 +174,46 @@ As result it produces an .a3m file that contains the HMM for the sequence and a 
 HHBlits was runned on [HPC Polito](https://hpc.polito.it/) using .... (le farei capire che non è stato bello)
 Example: MARINA AIUTO
 
-hhblits -cpu 2 -i ${TARGET_SEQ}.fa -d Project/database/uniclust30_2018_08/uniclust30_2018_08 -oa3m ${TARGET_SEQ}.a3m -ohhm ${TARGET_SEQ}.hhm -n 3
+``` 
+hhblits -cpu 2 -i ${TARGET_SEQ}.fa -d Project/database/uniclust30_2018_08/uniclust30_2018_08 -oa3m ${TARGET_SEQ}.a3m -ohhm ${TARGET_SEQ}.hhm -n 3 
+```
 
-## ProSPr <a name="prospr"></a>
+## ProSPr : Democratized Implementation of Alphafold Protein Distance Prediction Network <a name="prospr"></a>
 
-E adesso mi ammazzo 
+Deep mind's folding algorithm code for [Alphafold](https://deepmind.com/blog/article/alphafold-a-solution-to-a-50-year-old-grand-challenge-in-biology) is still not available but [ProSPr](https://www.biorxiv.org/content/10.1101/830273v1) enbles us to exploit ..., so we are able to retrive the distance matrix from each sequence.
+
+![distance matrix](Figures/distance_matrix.png)
+
+The matrix represents the probability that amino acid i and j is less than a certain treshold.
+
+The algorithm takes as input an a3m file containing the protein profile and gives as output a pkl file with the following keys:
+* Domain: path del file
+* Sequence: Primary structure
+* Secondary strcuture: array that contains the probability that one aa is part of a secondary structure using [DSSP](https://en.wikipedia.org/wiki/DSSP_(hydrogen_bond_estimation_algorithm)) notation
+* [Phi angle](https://proteopedia.org/wiki/index.php/Phi_and_Psi_Angles) : torsion angle between alpha carbon
+* [Psi angle](https://proteopedia.org/wiki/index.php/Phi_and_Psi_Angles) : tosion angle between beta carbon
+* Accessible Surface Area ([ASA](https://en.wikipedia.org/wiki/Accessible_surface_area))
+* Network: subdivision of the protein into smaller chunck to be maneged by the model: description for the prediction task parameters
+* Description
+
+And it contains the distance probability matrix in the form:
+* Distribution: array with dimension (seq, seq, dist_bin), it means that 
+* Distribution bins map: list of bins of distance
+
+In the following the code to plot the distance matrix:
+
+```
+pkl = np.load("/content/drive/MyDrive/Pickle_Test/2_ATF1_EWSR1_prediction.pkl", allow_pickle=True)
+pkl.keys()
+dist = pkl['dist'].sum(axis=0)
+distbin = np.zeros_like(pkl['dist'][0])
+for i in range(10):
+  distbin += pkl['dist_bin_map'][i]*pkl['dist'][i]
+
+fig, ax = plt.subplots(figsize=(8,8))
+sns.heatmap(distbin,cmap=sns.color_palette("Blues_r", as_cmap=True))
+plt.show()
+```
 
 ## Direct-Coupling Analysis <a name="dca"></a>
 The alignment results produced with HHBlits are then used to fit a statistical model called Direct-Coupling Analysis (DCA). 
