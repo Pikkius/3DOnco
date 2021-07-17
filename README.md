@@ -30,7 +30,7 @@
 
 # Data <a name="Data"></a>
 
-![gene_fusion](Figures/Gene_fusion.PNG =250x100)
+![gene_fusion](Figures/Gene_fusion.PNG)
 
 For this purpose we used data from [DEEPrior](https://github.com/bioinformatics-polito/DEEPrior), which are contain in a csv file that for each fusion pair contain:
 * Name of the fusion pair
@@ -51,8 +51,10 @@ Gene fusions are specific kind of aberrations that happen when parts of two diff
 In this scenario, the coordinates of the base pair at which the 2 genes are fused together is called breakpoint, so we refer to the gene BEFORE the break point as <b>5' gene </b> and to the gene AFTER the break point as <b>3' gene </b>.
 
 An eukaryotic transcript is characterised by different areas:
+
 ![eukariotc transcript](https://s3-us-west-2.amazonaws.com/courses-images/wp-content/uploads/sites/198/2016/11/23232432/Figure_15_03_02.png)
     
+
 
 the ones of interest for our study are the coding DNA sequences (CDS) which are the regions that are transcribed into RNA and translated into proteins. Moreover, a single gene can produce multiple different RNAs due to splicig procedure (?) that are called _transcripts_ and, for each gene, we consider one single transcript that is the longest one; also, if two transcripts have the same length, than we consider the one with the highest number of coding sequences. 
 
@@ -63,46 +65,43 @@ Building gene fusions sequences requires to consider two important things:
 With 2 genes and 2 signs this leads to 4 different cases: 
 ![cases](Figures/CASES.PNG)
 
-If we consider the 5' gene and it transcribes in the + strand, or the 3' gene that transcribes in the - strand, the portion of the gene that preceeds the breakpoint is selected. (FAcciamo uno schemino??)
+If we consider the 5' gene and it transcribes in the + strand, or the 3' gene that transcribes in the - strand, the portion of the gene that preceeds the breakpoint is selected. 
 
-On the other hand, if we consier the 5' gene that transcribes in the - strand or the 5+ gene that transcribes in the + strand, we take the portion of the gene that follows the breakpoint.  (Anche qui??)
+On the other hand, if we consier the 5' gene that transcribes in the - strand or the 5+ gene that transcribes in the + strand, we take the portion of the gene that follows the breakpoint. 
 
 Moreover we have to take into account the position of the break points. 
 
 If the break point is inside a CDS for both the genes the transcripts are merged together based on the previous rules.
 
-But we need to be more carefull if the break point is inside an intron or inside an Untranslated Region (UTR):
-SCHEMA
+But we need to be more carefull if the break point is inside an intron or inside an Untranslated Region (UTR)
 
-5' gene transcribes with + sign 
+<b>5' gene transcribes with + sign:</b>
 
-bp into an exon we should stop the transcription of this gene at the preceding CDS.
+* bp into an exon we should stop the transcription of this gene at the preceding CDS.
 
-5' UTR --> NULL
-3' UTR --> GENE COMPLETE
+* bp into 5' UTR --> Nothing
+* bp into 3' UTR --> Complete gene
 
-5' gene transcribes with - sign 
+<b>5' gene transcribes with - sign:</b>
 
-bp into an exon we should stop the transcription of this gene at the following CDS. (perchè stiamo sempre leggendo sul + strand)
+* bp into an exon we should stop the transcription of this gene at the following CDS. (perchè stiamo sempre leggendo sul + strand)
 
-5' UTR --> GENE COMPLETE
-3' UTR --> NULL
+* bp into 5' UTR --> Complete gene
+* bp into 3' UTR --> Nothing
 
-3' gene transcribes with + sign 
+<b>3' gene transcribes with + sign:</b> 
 
-bp into an exon we should start the transcription of this gene at the following CDS.
+* bp into an exon we should start the transcription of this gene at the following CDS.
+* bp into 5' UTR --> Complete Gene
+* bp into 3' UTR --> Nothing
 
-5' UTR --> 
-3' UTR --> 
+<b>3' gene transcribes with - sign:</b>
 
-3' gene transcribes with - sign 
+* bp into an exon we should start the transcription of this gene at the preceding CDS. (perchè stiamo sempre leggendo sul + strand)
+* bp into 5' UTR --> Nothing
+* bp into 3' UTR --> Complete Gene
 
-bp into an exon we should start the transcription of this gene at the preceding CDS. (perchè stiamo sempre leggendo sul + strand)
 
-5' UTR --> 
-3' UTR --> 
-
-FINE SCHEMA
 
 #FUNCTION
 (Implemented on Colab gli diamo qualche specifica?)
@@ -152,7 +151,6 @@ MALNSELS
 
 # Protein Structure Prediction <a name="psp"></a>
 
-scriviamo di alphafold?
 
 Protein structure prediction is one of the most interesting tasks in bioinformatics field, since interactions among proteins are ruled principally by their own 3d sturcture. The structure of the protein can be analyzed and considered from four different levels: primary, secondary, tertiary and quaternary. 
 
