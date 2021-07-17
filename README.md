@@ -231,7 +231,7 @@ plt.show()
 
 The algorithm is basically divided into 3 main blocks:
 
-<center>![prospr](Figures/prospr.png)</center>
+![prospr](Figures/prospr.png)
 
 *In the first part the alignment results produced with HHBlits are then used to fit a statistical model called Direct-Coupling Analysis ([DCA](https://arxiv.org/pdf/1801.04184.pdf)), in this case indicates with Potts model. [The model aims to find a probability for each sequence that can be interpreted as the probability that the sequence in question belongs to the same class of sequences as the ones in the MSA](https://en.wikipedia.org/wiki/Direct_coupling_analysis).
 
@@ -249,8 +249,7 @@ In particular, in this version the DCA analysis is substituted with a simpler on
 
 
 On average a protein to complete the HHBlist and Propspr takes 3 hours
-#TDA
-
+# TDA
 Now that we have the matrix, we want to be sure that they contains significant pattern for the classification.
 # Models <a name="models"></a>
 
