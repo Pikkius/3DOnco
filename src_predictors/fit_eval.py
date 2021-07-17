@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-from treDOnco.model import model_3DOnco
+from model import model_3DOnco, attentionLSTM
 
 import copy
 from torch.utils.data import DataLoader
@@ -16,8 +16,11 @@ def Train(train_set, val_set, config):
     train_dataloader = DataLoader(train_set, batch_size=config.BATCH_SIZE, shuffle=True, num_workers=0, drop_last=False)
     val_dataloader = DataLoader(val_set, batch_size=config.BATCH_SIZE, shuffle=False, num_workers=0, drop_last=False)
 
-    net = model_3DOnco('conv', config.inputs_voc, config.hidden_dim, config.SEQ_LEN)
-    net = net.to(config.DEVICE)
+    if config.NET == model_3DOnco:
+        net = config.NET('conv', config.inputs_voc, config.hidden_dim, config.SEQ_LEN)
+        net = net.to(config.DEVICE)
+    elif config.NET == attentionLSTM:
+        net = config.NET()
 
     criterion = nn.CrossEntropyLoss()
     parameters_to_optimize = net.parameters()

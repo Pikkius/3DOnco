@@ -19,7 +19,6 @@ class Protein(Dataset):
         self.construct_labels()
 
         for el in list(os.listdir(self.root)):
-
             key, value = el.split('_', 1)
             self.prot_names[key] = value
 
@@ -33,8 +32,6 @@ class Protein(Dataset):
 
         features['seq'] = self.create_sequence_matrix(pkl['seq'])
         features['ss'] = pkl['ss']
-        features['phi'] = pkl['phi']
-        features['psi'] = pkl['psi']
         features['matrix'] = pkl['dist']
 
         protein_len = features['ss'].shape[1]
@@ -43,6 +40,10 @@ class Protein(Dataset):
         if protein_len > self.seq_len:
             features = self.crop(features, protein_len)
 
+        features['dist_bin'] = np.zeros_like(features['matrix'][0])
+        for i in range(10):
+            features['dist_bin'] += pkl['dist_bin_map'][i] * features['matrix'][i]
+
         fa_name = f'{self.root}/{name}/{name}.fa'  # fa_name=f'{path}/{name}/{name}.fa'
         with open(fa_name) as f:
             header = str(f.readlines())
@@ -50,10 +51,7 @@ class Protein(Dataset):
             f.close()
 
         return (torch.tensor(features['seq'], dtype=torch.float),
-                torch.tensor(features['ss'], dtype=torch.float),
-                torch.tensor(features['phi'], dtype=torch.float),
-                torch.tensor(features['psi'], dtype=torch.float),
-                torch.tensor(features['matrix'], dtype=torch.float),
+                torch.tensor(features['dist_bin'], dtype=torch.float),
                 torch.tensor(label, dtype=torch.long))
 
     def __len__(self):
@@ -66,8 +64,8 @@ class Protein(Dataset):
         for el in list(os.listdir(self.root)):
             el_fa = el + '/' + el + '.fa'
             el = el + '/' + el + '_prediction.pkl'  # 12_asd_Asd/12_asd_Asd_prediction.pkl
-            
-            if os.path.isfile(self.root+'/'+el):
+
+            if os.path.isfile(self.root + '/' + el):
                 self.indexs.append(el.split('_')[0])
                 with open(self.root + '/' + el_fa, 'r') as f:
                     header = str(f.readlines())
@@ -78,9 +76,12 @@ class Protein(Dataset):
     def padding(self, features):
         for key, value in features.items():
             if key == 'matrix':
-                features[key] = np.pad(value, ((0, 0), (0, self.seq_len - value.shape[1]), (0, self.seq_len - value.shape[2])))
+                features[key] = np.pad(value,
+                                       ((0, 0), (0, self.seq_len - value.shape[1]), (0, self.seq_len - value.shape[2])),
+                                       constant_values=(-55, -55))
             else:
-                features[key] = np.pad(value, ((0, 0), (0, self.seq_len - value.shape[1])))  # 1, dict, seq_len
+                features[key] = np.pad(value, ((0, 0), (0, self.seq_len - value.shape[1])),
+                                       constant_values=(-55, -55))  # 1, dict, seq_len
         return features
 
     def crop(self, features, protein_len):
@@ -88,10 +89,10 @@ class Protein(Dataset):
         for key, value in features.items():
 
             if key == 'matrix':
-                features[key] = value[:, index_start:index_start+self.seq_len, index_start:index_start+self.seq_len]
+                features[key] = value[:, index_start:index_start + self.seq_len, index_start:index_start + self.seq_len]
 
             else:
-                features[key] = value[:, index_start:index_start+self.seq_len]
+                features[key] = value[:, index_start:index_start + self.seq_len]
 
         return features
 

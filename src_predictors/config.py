@@ -1,13 +1,12 @@
 import os
 import json
 from datetime import datetime
+import shutil
 
 
 class Config:
     DEVICE = 'cpu'
     BATCH_SIZE = 1
-
-    inputs_voc = [20, 9, 37, 37, 10]
 
     save_out = True
     save_graph = True
@@ -18,9 +17,9 @@ class Config:
     STEP_SIZE = 20
     GAMMA = 0.1
     LOG_FREQUENCY = 20
-    SEQ_LEN = 1000
 
-    hidden_dim = 8
+    NET = None
+    netkargs= None
 
     out_dir = None
 
@@ -29,7 +28,9 @@ class Config:
             self.load_config(dictionay)
         if self.out_dir is None:
             setattr(self, 'out_dir', datetime.now().strftime("%d_%b_%Y_%H"))
-            os.mkdir(self.out_dir)
+            if os.path.exists(self.out_dir):
+                shutil.rmtree(self.out_dir)
+            os.makedirs(self.out_dir)
 
     def __getitem__(self, item):
         return getattr(self, item)
