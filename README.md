@@ -11,7 +11,8 @@
 
 # 3DOnco - An oncogenic fusion prediction tool (Adi is editing)
 
-Starting from 2 chromosomes and their breakpoints the tool simulates the gene fusion and then predicts the nature of the hybrid protein as oncogenic or not (non è il gene che è oncogenic?) through its 3d structure.
+<b>The tool is a gene fusion classification algorithm for onco and not onco protein: starting from 2 chromosomes and their breakpoints the tool simulates the gene fusion and then predicts the nature of the hybrid protein as oncogenic or not (non è il gene che è oncogenic?) through its 3d structure. </b>
+
 
 # Table of Contents
 
@@ -28,6 +29,8 @@ Starting from 2 chromosomes and their breakpoints the tool simulates the gene fu
 ---
 
 # Data <a name="Data"></a>
+
+![gene_fusion](Figures/Gene_fusion.PNG)
 
 For this purpose we used data from [DEEPrior](https://github.com/bioinformatics-polito/DEEPrior), which are contain in a csv file that for each fusion pair contain:
 * Name of the fusion pair
@@ -51,7 +54,6 @@ An eukaryotic transcript is characterised by different areas:
 ![eukariotc transcript](https://s3-us-west-2.amazonaws.com/courses-images/wp-content/uploads/sites/198/2016/11/23232432/Figure_15_03_02.png)
     
 
-
 the ones of interest for our study are the coding DNA sequences (CDS) which are the regions that are transcribed into RNA and translated into proteins. Moreover, a single gene can produce multiple different RNAs due to splicig procedure (?) that are called _transcripts_ and, for each gene, we consider one single transcript that is the longest one; also, if two transcripts have the same length, than we consider the one with the highest number of coding sequences. 
 
 Building gene fusions sequences requires to consider two important things:
@@ -59,8 +61,7 @@ Building gene fusions sequences requires to consider two important things:
 * it the gene transcribes in the + or in the - strand. In this case the - strand must be reversed and the bases must be substituted with their complementaries, since the databases contain only + strand genes.
 
 With 2 genes and 2 signs this leads to 4 different cases: 
-IMMA
-
+![cases](Figures/cases.PNG)
 
 If we consider the 5' gene and it transcribes in the + strand, or the 3' gene that transcribes in the - strand, the portion of the gene that preceeds the breakpoint is selected. (FAcciamo uno schemino??)
 
@@ -183,7 +184,8 @@ HHBlits is a very fast and sensitive algorithm thanks to a two-stage prefilter p
 As result it produces an .a3m file that contains the HMM for the sequence and a .hhr file for the details.
 
 HHBlits was runned on [HPC Polito](https://hpc.polito.it/) using .... (le farei capire che non è stato bello)
-Example: MARINA AIUTO
+
+Example: 
 
 ``` 
 hhblits -cpu 2 -i ${TARGET_SEQ}.fa -d Project/database/uniclust30_2018_08/uniclust30_2018_08 -oa3m ${TARGET_SEQ}.a3m -ohhm ${TARGET_SEQ}.hhm -n 3 
@@ -193,7 +195,7 @@ hhblits -cpu 2 -i ${TARGET_SEQ}.fa -d Project/database/uniclust30_2018_08/uniclu
 
 Deep mind's folding algorithm code for [Alphafold](https://deepmind.com/blog/article/alphafold-a-solution-to-a-50-year-old-grand-challenge-in-biology) is still not available but [ProSPr](https://www.biorxiv.org/content/10.1101/830273v1) enbles us to exploit ..., so we are able to retrive the distance matrix from each sequence.
 
-![distance matrix](Figures/distance_matrix.png)
+<center>![distance matrix](Figures/distance_matrix.png)</center>
 
 The matrix represents the probability that amino acid i and j is less than a certain treshold.
 
@@ -226,11 +228,29 @@ sns.heatmap(distbin,cmap=sns.color_palette("Blues_r", as_cmap=True))
 plt.show()
 ```
 
-## Direct-Coupling Analysis <a name="dca"></a>
-The alignment results produced with HHBlits are then used to fit a statistical model called Direct-Coupling Analysis (DCA). 
+The algorithm is basically divided into 3 main blocks:
+
+<center>![prospr](Figures/prospr.png)</center>
+
+*In the first part the alignment results produced with HHBlits are then used to fit a statistical model called Direct-Coupling Analysis ([DCA](https://arxiv.org/pdf/1801.04184.pdf)), in this case indicates with Potts model. [The model aims to find a probability for each sequence that can be interpreted as the probability that the sequence in question belongs to the same class of sequences as the ones in the MSA](https://en.wikipedia.org/wiki/Direct_coupling_analysis).
+
+FORMULA
+
+
+It should be computed by exploting maximum likehood estimation (ie find the sequnce of aa that maximes the probability) but since it is a computationally complex task usually it is derived by inference. 
+*In the second one is the network which is composed by a RESNET and some convolutionl layers.
+*In the third one is an overview of the transformation for the input vector
+
+Now we are exlploiting and [updated version](https://github.com/dellacortelab/prospr) of the code, but the main composition is still the same.
+
+In particular, in this version the DCA analysis is substituted with a simpler one based on covariance matrix that reduces the computational time called for simplicity ['fast DCA'](https://direct.mit.edu/neco/article/29/11/3040/8328/Sparse-Covariance-Matrix-Estimation-by-DCA-Based).
+
+
 
 On average a protein to complete the HHBlist and Propspr takes 3 hours
+#TDA
 
+Now that we have the matrix, we want to be sure that they contains significant pattern for the classification.
 # Models <a name="models"></a>
 
 Rete CONV
@@ -242,4 +262,5 @@ RANDOM FOREST
 
 # Results <a name="results"></a>
 
-CHE SCHIFO 
+
+
