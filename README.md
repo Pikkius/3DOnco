@@ -257,12 +257,15 @@ plt.show()
 
 The algorithm is basically divided into 3 main blocks:
 
-![prospr](Figures/prospr.png)
+<p align="center">
+  <img src="Figures/prospr.png" alt="drawing" width="600"/>
+</p>
 
 *In the first part the alignment results produced with HHBlits are then used to fit a statistical model called Direct-Coupling Analysis ([DCA](https://arxiv.org/pdf/1801.04184.pdf)), in this case indicates with Potts model. [The model aims to find a probability for each sequence that can be interpreted as the probability that the sequence in question belongs to the same class of sequences as the ones in the MSA](https://en.wikipedia.org/wiki/Direct_coupling_analysis).
 
-![dca](Figures/dca.PNG)
-
+<p align="center">
+  <img src="Figures/dca.PNG" alt="drawing" width="300"/>
+</p>
 
 It should be computed by exploting maximum likehood estimation (ie find the sequnce of aa that maximes the probability) but since it is a computationally complex task usually it is derived by inference. 
 *In the second one is the network which is composed by a RESNET and some convolutionl layers.
@@ -286,7 +289,9 @@ a 10 e 1 canale
 ## Random Forest <a name="rf"></a>
 Random forest is a an ensemble machine learning technique that can be exploited both for classification and regression.
 The algorithm consists in many decision trees that predict indipendently and then vote for the result.
-![rf](https://cdn.corporatefinanceinstitute.com/assets/random-forest.png)
+<p align="center">
+  <img src="https://cdn.corporatefinanceinstitute.com/assets/random-forest.png" alt="drawing" width="550"/>
+</p>
 
 ### Matrix analysis
 For semplicity we transform the 10 channels matrix into a 1 channel matrix, exploiting the code used for visualize it. 
@@ -307,7 +312,9 @@ The same procedure is now proposed using just the protein sequence, so we can se
 
 Firsly we need to encode the sequences into a [one hot encoding form](https://pdfs.semanticscholar.org/8aeb/ecf42891c94bdddd4eabb1ad5ae0e6700281.pdf?_ga=2.171528992.1835270510.1626557090-1170679748.1626189564).
 
-![onehot](Figures/one_hot.PNG)
+<p align="center">
+  <img src="Figures/one_hot.PNG" alt="drawing" width="300"/>
+</p>
 
 Then we finetuning the algorithm in the same way.
 # Results <a name="results"></a>
