@@ -11,7 +11,7 @@
 
 # 3DOnco - An oncogenic fusion prediction tool (Mari is editing)
 
-<b>The tool is a gene fusion classification algorithm for onco and not onco proteins: starting from 2 chromosomes and their break-points the tool simulates the gene fusion and then predicts the nature of the hybrid protein as oncogenic or not (non è il gene che è oncogenic?) through its 3d structure. </b>
+<b>The tool is a gene fusion prioritization algorithm for the classification of oncogenic and not oncogenic proteins: starting from 2 chromosomes and their breakpoints the tool simulates the gene fusion and then predicts the nature of the hybrid protein as oncogenic or not through its 3d structure. </b>
 
 <p align="center">
   <img src="Figures/Gene_fusion.PNG" alt="drawing" width="600"/>
@@ -37,17 +37,23 @@
 # Data <a name="Data"></a>
 
 
-For this purpose we used data from [DEEPrior](https://github.com/bioinformatics-polito/DEEPrior), which are contain in a csv file that for each fusion pair contain:
-* Name of the fusion pair
-* Label 1 if oncogenic, 0 otherwise 
-* 5' Gene and break point
-* 3' Gene and break point
+For this purpose we used the data from [DEEPrior](https://github.com/bioinformatics-polito/DEEPrior), which are contained in a tab separated file that for each fusion pair gives:
+* Chromosome number of 5p gene
+* Breakpoint coordinate of 5p gene
+* Chromosome number of 3p gene
+* Breakpoint coordinate of 3p gene
 
-That are collected from [COSMIC](https://cancer.sanger.ac.uk/cosmic/fusion) (Catalog of Somatic Mutations in Cancer) for Oncogenic gene fusions and [Babicenau et al. work Recurrent chimeric fusion rnas in non-cancer tissues and cells](https://pubmed.ncbi.nlm.nih.gov/26837576/) for not oncogenic ones.
+The gene fusions of the training set are validated and the label values 1 if the fusion is oncogenic, 0 otherwise. 
 
-Conta quanti sono per classe 
+The data of the training set are collected from [COSMIC](https://cancer.sanger.ac.uk/cosmic/fusion) (Catalog of Somatic Mutations in Cancer) for Oncogenic gene fusions and [Babicenau et al. work Recurrent chimeric fusion rnas in non-cancer tissues and cells](https://pubmed.ncbi.nlm.nih.gov/26837576/) for not oncogenic ones. Moreover, we have two different datasets to test the model: 
 
-Mettiamo la distribuzione delle lunghezze ?
+* the Onco gene fusions of the first one are obtained from the ChimerDB2.0 database, while the Not Onco corresponds to the false positives reported by TopHat-Fusion and STAR-Fusion on Illumina BodyMap 2.0 samples; 
+* the second test set is composed by oncogenic gene fusions built from the work of [Gao et al. Driver fusions and their implications in the development and treatment of human cancers](https://pubmed.ncbi.nlm.nih.gov/29617662/).
+
+In the figures below, we can see the **distribution** of our data:
+- PLOTS DISTRIBUZIONE DATI
+- PLOTS DISTRIBUZIONE LUNGHEZZE
+
 # Gene Fusion <a name="Gene"></a>
 
 ## Theory <a name="theory"></a>
