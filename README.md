@@ -27,8 +27,9 @@
   - [HHBlits](#hhblits)
   - [ProSPr](#prospr)
 - [Models](#models)
+  - [TDA](#tda)
   - [Neural Network](#nn)
-  - [Random Forest](#rf)
+  - [Machine Learning](#ml)
 - [Results](#results)
 
 
@@ -281,7 +282,7 @@ On average a protein to complete the HHBlist and Propspr takes 3 hours
 
 # Models <a name="models"></a>
 Now that we have the distance prediction matrices, we want to be sure that they contains significant pattern that allow us to distinguish between oncogenic and not oncogenic fusions. 
-## Topological Data Analysis 
+## Topological Data Analysis  <a name="tda"></a>
 We can interpret the distance prediction matrices as weight matrices referred to a graph, where the nodes represent the residues and the weights represent the predicted distances between each pair of aminoacids. Using this network structure, we can exploit algebraic topology and topological data analysis to obtain some insights about the properties of these matrices. 
 
 Topological data analysis is a very important tool based on simplicial complexes, which are a generalization of the concept of graph. One of the main application of TDA is simplicial homology, also known as the _theory of holes_, since in simple words its goal is to detect similarities or differences between two objects (simplicial complexes)  by analyzing the holes in their topological structures. 
@@ -292,12 +293,15 @@ Rete CONV
 LSTM
 UNA BELLA FIGURA DELLA RETE ???????????????????????????????? 
 a 10 e 1 canale
-## Random Forest <a name="rf"></a>
+## Machine Learning  <a name="ml"></a>
+### 1. Random Forest <a name="rf"></a>
 Random forest is an ensemble machine learning technique that can be exploited both for classification and regression.
 The algorithm consists in many decision trees that predict indipendently and then vote for the result.
 <p align="center">
   <img src="https://cdn.corporatefinanceinstitute.com/assets/random-forest.png" alt="drawing" width="550"/>
 </p>
+
+### 2. SVM <a name="svm"></a>
 
 ### Matrix analysis
 For semplicity we transform the 10 channels matrix into a 1 channel matrix, exploiting the code used for visualize it. 
