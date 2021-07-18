@@ -67,8 +67,7 @@ An eukaryotic transcript is characterised by different areas:
   <img src="https://s3-us-west-2.amazonaws.com/courses-images/wp-content/uploads/sites/198/2016/11/23232432/Figure_15_03_02.png" alt="drawing" width="350"/>
 </p>
 
-
-the ones of interest for our study are the coding DNA sequences (CDS) which are the regions that are transcribed into RNA and translated into proteins. Moreover, a single gene can produce multiple different RNAs due to splicig procedure (?) that are called _transcripts_ and, for each gene, we consider one single transcript that is the longest one; also, if two transcripts have the same length, than we consider the one with the highest number of coding sequences. 
+The ones of interest for our study are the coding DNA sequences (CDS) which are the regions that are transcribed into RNA and then translated into proteins. Moreover, due to the splicing procedure, a single gene can produce multiple different RNAs that are called _transcripts_: for each gene, we consider one single transcript that is the longest one; also, if two transcripts have the same length, then we consider the one with the highest number of coding sequences. 
 
 Building gene fusions sequences requires to consider two important things:
 * if we are dealing with the 5' gene (first gene of the fusion) or the 3' gene (second gene of the fusion)
@@ -79,15 +78,11 @@ With 2 genes and 2 signs this leads to 4 different cases:
   <img src="Figures/CASES.PNG" alt="drawing" width="550"/>
 </p>
 
-If we consider the 5' gene and it transcribes in the + strand, or the 3' gene that transcribes in the - strand, the portion of the gene that preceeds the breakpoint is selected. 
+If we consider the 5' gene and it transcribes in the + strand, or the 3' gene that transcribes in the - strand, the portion of the gene that preceeds the breakpoint is selected. On the other hand, if we consider the 5' gene that transcribes in the - strand or the 5+ gene that transcribes in the + strand, we take the portion of the gene that follows the breakpoint. 
 
-On the other hand, if we consier the 5' gene that transcribes in the - strand or the 5+ gene that transcribes in the + strand, we take the portion of the gene that follows the breakpoint. 
-
-Moreover we have to take into account the position of the break points. 
-
-If the break point is inside a CDS for both the genes the transcripts are merged together based on the previous rules.
-
-But we need to be more carefull if the break point is inside an intron or inside an Untranslated Region (UTR)
+Moreover we have to take into account the **position of the breakpoints**: 
+* if the break point is inside a **CDS** for both the genes the transcripts are merged together based on the previous rules;
+* if the breakpoint is inside an **intron** or inside an **Untranslated Region** (UTR) we need to do further considerations.
 
 <b>5' gene transcribes with + sign:</b>
 
