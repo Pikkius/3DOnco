@@ -304,14 +304,14 @@ Firsly we need to encode the sequences into a [one hot encoding form](https://pd
 
 Then we finetuning the algorithm in the same way.
 # Results <a name="results"></a>
-# Accuracy <a name="results"></a>
+## Accuracy <a name="results"></a>
 
 Using only the distance matrix and tuning the random forest we achieved an accuracy score of: XXXXXXXXXX
 
 Instead, using only the amino acid sequence we achieved: XXXXXXXXXXXXX
 
 
-# Conclusion <a name="results"></a>
+## Conclusion <a name="results"></a>
 
 We can see that the 3d strcuture does not lead to a significant improving of the performance of the algorithm. In fact, as states in [Anfinsen's dogma](https://en.wikipedia.org/wiki/Anfinsen%27s_dogma) (sto esagerando?) the strcuture of a protein (at least for the littlest ones) is determined only by its amino acid sequence.
 In this sense, retriving the 3d structure does not add information (???) che sto dicendo, ha senso ?
