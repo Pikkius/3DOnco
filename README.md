@@ -196,11 +196,13 @@ After creating the HMM, the HHBlits server iteratively searches through an HMM d
 
 HHBlits is a very fast and sensitive algorithm thanks to a two-stage prefilter phase that reduces the number of database HMMs to be aligned. 
 
-As result it produces an .a3m file that contains the HMM for the sequence and a .hhr file for the details.
+AGGIUNGERE QUALCOSA SU COME FUNZIONA L'OTTIMIZZAZIONE E L'ALGORITMO 
+
+As a result it produces an .a3m file that contains the HMM for the sequence and a .hhr file for the details.
 
 HHBlits was runned on [HPC Polito](https://hpc.polito.it/) using .... (le farei capire che non è stato bello)
 
-Example: 
+Example of the usage of the tool: 
 
 ``` 
 hhblits -cpu 2 -i ${TARGET_SEQ}.fa -d Project/database/uniclust30_2018_08/uniclust30_2018_08 -oa3m ${TARGET_SEQ}.a3m -ohhm ${TARGET_SEQ}.hhm -n 3 
@@ -208,13 +210,13 @@ hhblits -cpu 2 -i ${TARGET_SEQ}.fa -d Project/database/uniclust30_2018_08/uniclu
 
 ## ProSPr : Democratized Implementation of Alphafold Protein Distance Prediction Network <a name="prospr"></a>
 
-Deep mind's folding algorithm code for [Alphafold](https://deepmind.com/blog/article/alphafold-a-solution-to-a-50-year-old-grand-challenge-in-biology) is still not available but [ProSPr](https://www.biorxiv.org/content/10.1101/830273v1) enbles us to exploit ..., so we are able to retrive the distance matrix from each sequence.
+Deep mind's folding algorithm code for [Alphafold](https://deepmind.com/blog/article/alphafold-a-solution-to-a-50-year-old-grand-challenge-in-biology) is still not available but [ProSPr](https://www.biorxiv.org/content/10.1101/830273v1) enbles us to exploit ..., so we are able to retrieve the distance matrix from each sequence.
 
 <center>![distance matrix](Figures/distance_matrix.png)</center>
 
 The matrix represents the probability that amino acid i and j is less than a certain treshold.
 
-In addition alphafold exploits these information togetehr with a folding algirthm (like [Rosetta](https://boinc.bakerlab.org/)) that takes into account electostatic forces, vand der Waals interaction and so on (MARINA HELP). 
+In addition alphafold exploits these information together with a folding algorithm (like [Rosetta](https://boinc.bakerlab.org/)) that takes into account electostatic forces, vand der Waals interaction and so on (MARINA HELP). 
 
 But due to our computational limit we decided to limit our analysis to the study of the distance matrix.
 
@@ -260,10 +262,10 @@ The algorithm is basically divided into 3 main blocks:
 </p>
 
 It should be computed by exploting maximum likehood estimation (ie find the sequnce of aa that maximes the probability) but since it is a computationally complex task usually it is derived by inference. 
-*In the second one is the network which is composed by a RESNET and some convolutionl layers.
-*In the third one is an overview of the transformation for the input vector
+*In the second one there is the network which is composed by a RESNET and some convolutionl layers.
+*In the third one there is an overview of the transformation for the input vector
 
-Now we are exlploiting and [updated version](https://github.com/dellacortelab/prospr) of the code, but the main composition is still the same.
+Now we are exlploiting an [updated version](https://github.com/dellacortelab/prospr) of the code, but the main composition is still the same.
 
 In particular, in this version the DCA analysis is substituted with a simpler one based on covariance matrix that reduces the computational time called for simplicity ['fast DCA'](https://direct.mit.edu/neco/article/29/11/3040/8328/Sparse-Covariance-Matrix-Estimation-by-DCA-Based).
 
@@ -279,7 +281,7 @@ LSTM
 UNA BELLA FIGURA DELLA RETE ???????????????????????????????? 
 a 10 e 1 canale
 ## Random Forest <a name="rf"></a>
-Random forest is a an ensemble machine learning technique that can be exploited both for classification and regression.
+Random forest is an ensemble machine learning technique that can be exploited both for classification and regression.
 The algorithm consists in many decision trees that predict indipendently and then vote for the result.
 <p align="center">
   <img src="https://cdn.corporatefinanceinstitute.com/assets/random-forest.png" alt="drawing" width="550"/>
