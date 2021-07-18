@@ -258,13 +258,13 @@ plt.show()
 The algorithm is basically divided into 3 main blocks:
 
 <p align="center">
-  <img src="Figures/prospr.png" alt="drawing" width="600"/>
+  <img src="Figures/prospr.png" alt="drawing" width="700"/>
 </p>
 
 *In the first part the alignment results produced with HHBlits are then used to fit a statistical model called Direct-Coupling Analysis ([DCA](https://arxiv.org/pdf/1801.04184.pdf)), in this case indicates with Potts model. [The model aims to find a probability for each sequence that can be interpreted as the probability that the sequence in question belongs to the same class of sequences as the ones in the MSA](https://en.wikipedia.org/wiki/Direct_coupling_analysis).
 
 <p align="center">
-  <img src="Figures/dca.PNG" alt="drawing" width="300"/>
+  <img src="Figures/dca.PNG" alt="drawing" width="400"/>
 </p>
 
 It should be computed by exploting maximum likehood estimation (ie find the sequnce of aa that maximes the probability) but since it is a computationally complex task usually it is derived by inference. 
@@ -313,7 +313,7 @@ The same procedure is now proposed using just the protein sequence, so we can se
 Firsly we need to encode the sequences into a [one hot encoding form](https://pdfs.semanticscholar.org/8aeb/ecf42891c94bdddd4eabb1ad5ae0e6700281.pdf?_ga=2.171528992.1835270510.1626557090-1170679748.1626189564).
 
 <p align="center">
-  <img src="Figures/one_hot.PNG" alt="drawing" width="300"/>
+  <img src="Figures/one_hot.PNG" alt="drawing" width="200"/>
 </p>
 
 Then we finetuning the algorithm in the same way.
