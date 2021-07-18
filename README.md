@@ -84,74 +84,51 @@ Moreover we have to take into account the **position of the breakpoints**:
 * if the break point is inside a **CDS** for both the genes the transcripts are merged together based on the previous rules;
 * if the breakpoint is inside an **intron** or inside an **Untranslated Region** (UTR) we need to do further considerations.
 
-We can summarize all the cases in the tables below. First, we consider the effects on the 5' gene:
+We can summarize all the considerations of the second case in the tables below. First, we consider the effects on the 5' gene:
 
 | **Gene**  | **Strand**  |  **BP position**  | **Result**  |
 |---|---|---|---|
-| 5'  | + |   |   |
-| 5'  | + |   |   |
-| 5'  | + |   |   |
-| 5'  | - |   |   |
-| 5'  | - |   |   |
-| 5'  | - |   |   |
+| 5'  | + | intron  | stop the transcription of this gene at the preceding CDS  |
+| 5'  | + | 5' UTR  | take nothing  |
+| 5'  | + | 3' UTR  | take complete gene  |
+| 5'  | - | intron  | stop the transcription of this gene at the following CDS |
+| 5'  | - | 5' UTR  | take complete gene  |
+| 5'  | - | 3' UTR  | take nothing  |
 
 Then, we analyze the same situations on the 3' gene:
 
 | **Gene**  | **Strand**  |  **BP position**  | **Result**  |
 |---|---|---|---|
-| 3'  | + |   |   |
-| 3'  | + |   |   |
-| 3'  | + |   |   |
-| 3'  | - |   |   |
-| 3'  | - |   |   |
-| 3'  | - |   |   |
+| 3'  | + | intron  | start the transcription of this gene at the following CDS  |
+| 3'  | + | 5' UTR  | take complete gene  |
+| 3'  | + | 3' UTR  | take nothing  |
+| 3'  | - | intron  | start the transcription of this gene at the preceding CDS  |
+| 3'  | - | 5' UTR  | take nothing  |
+| 3'  | - | 3' UTR  | take complete gene  |
 
-<b>5' gene transcribes with + sign:</b>
+## Class <a name="class"></a>
+CLASS O FUNCTION??? 
 
-* bp into an exon we should stop the transcription of this gene at the preceding CDS.
+After the review of the theory that underlines gene fusions, we can consider the class created to reconstruct the protein sequences obtained from the fused genes.  
+(Implemented on Colab gli diamo qualche specifica?
 
-* bp into 5' UTR --> Nothing
-* bp into 3' UTR --> Complete gene
+### 1. Filter Genome
 
-<b>5' gene transcribes with - sign:</b>
+First we need to filter the human genome. To do so, we implemented `Gene_Fusion.ipynb` that takes as input a gtf file which contains all the annotated human genome. The algorithm filters the data considering the _ensemble_ notation and gives as a result a correspondence one to one between a gene and its transcript. Since one gene can be associated to more than one transcript due to the splicing mechanims, in this case we selected the longest transcript and, in case of equality, the one that contains more CDS.
+At the end the results is ordered by chromosomes and stored in a csv file.
+The ipynb takes as argument the genome version of the input file coordinates: for semplicity we had already runned the file using GRCH37 and GRCH38. The csv results are inside the folder (NON LO SO), so you don't have to run again this part. For future updatings the time of run is about 20 minutues (di più). GRCH files can be downloaded [here](https://grch37.ensembl.org/info/data/ftp/index.html) and the usage of the function is the following one:
 
-* bp into an exon we should stop the transcription of this gene at the following CDS. (perchè stiamo sempre leggendo sul + strand)
+`python Gene_Fusion.py [-i INPUT] [-v VERSION]`
 
-* bp into 5' UTR --> Complete gene
-* bp into 3' UTR --> Nothing
-
-<b>3' gene transcribes with + sign:</b> 
-
-* bp into an exon we should start the transcription of this gene at the following CDS.
-* bp into 5' UTR --> Complete Gene
-* bp into 3' UTR --> Nothing
-
-<b>3' gene transcribes with - sign:</b>
-
-* bp into an exon we should start the transcription of this gene at the preceding CDS. (perchè stiamo sempre leggendo sul + strand)
-* bp into 5' UTR --> Nothing
-* bp into 3' UTR --> Complete Gene
-
-
-## FUNCTION
-
-(Implemented on Colab gli diamo qualche specifica?)
-
-## Filter Genome
-
-
-Firstly we need to filter the human genome, to do so we implemented `Gene_Fusion.ipyn` that takes in input a gtf file which contains all the genome annotated. The algorithm filter the data considering the ensembl notation and gives as result a correspondence one to one between a gene and its transcript. Since one gene can be associated to more tha one transcript due to splicing mechanims in this case we selected the transcript that contains more CDS.
-At the end the results is ordered by chromosomes and stored in a csv.
-The ipyn takes as input argument the version of the annotation, for semplicity we had already runned the file using GRCH37 and GRCH38. The csv results are inside the folder (NON LO SO), so you don't have to run again this part. For future updatings the time of run is about 20 minutues (di più). GRCH files can be downloaded [here](https://grch37.ensembl.org/info/data/ftp/index.html)
+VA BENE COSÌ??? DOBBIAMO SISTEMARE LA CLASSE
 
 ESEMPIO PER GLI SCEMI ---> ADELA
 
-## Gene Fusion
+### 2. Gene Fusion
 
-
-We prepared a function to simulate gene fusion in Gene_fusion_Andre.ipyn.
-The script takes as input 2 chromosome and 2 break points and then simulate the gene fusion. The first pair is associated to the 5' gene and the second one to the 3' gene.
-Moreover, the code to run need the gtf files for all the 48 chromosome and the csv file generated in the previous point. You can download the files from LINKS
+We prepared a function to simulate gene fusion in Gene_fusion_Andre.ipynb.
+The script takes as input 2 chromosomes and 2 breakpoints and then simulate the gene fusion. The first pair is associated to the 5' gene and the second one to the 3' gene.
+Moreover, in order to run the code we need the gtf files for all the 48 chromosome and the csv file generated in the previous point. You can download the files from LINKS
 
 As input we utilized the fusion pairs provided in DEEPrior. In any case, the file can take as input any csv file formatted as follow: 
 
@@ -168,14 +145,14 @@ As input we utilized the fusion pairs provided in DEEPrior. In any case, the fil
   </tr>
 </table>
 
-The function gives as ouput a a folder containing a fasta file that represents the protein generated by the fusion. Moreover in the first line of the fasta file is strored:
+The function gives as ouput a folder containing a fasta file that represents the protein generated by the fusion. Moreover in the first line of the fasta file is stored:
 * The index of the protein and the name of the fusion pair
-* The label 1 means that the protein is oncogenic, 0 otherwise
+* The label for the training data: 1 means that the protein is oncogenic, 0 otherwise
 
 And for each gene:
 * Chromosome
-* Coordinate of the break point
-* Name of gene under analysis
+* Coordinate of the breakpoint
+* Name of the gene under analysis
 * Sign of transcription
 * Shift (It means the module 3 of the length of the transcript)
 
@@ -191,8 +168,6 @@ Example of output fasta file:
 
 MALNSELS 
 ```
-
-
 
 # Protein Structure Prediction <a name="psp"></a>
 
