@@ -255,15 +255,15 @@ The algorithm is basically divided into 3 main blocks:
   <img src="Figures/prospr.png" alt="drawing" width="700"/>
 </p>
 
-*In the first part the alignment results produced with HHBlits are then used to fit a statistical model called Direct-Coupling Analysis ([DCA](https://arxiv.org/pdf/1801.04184.pdf)), in this case indicates with Potts model. [The model aims to find a probability for each sequence that can be interpreted as the probability that the sequence in question belongs to the same class of sequences as the ones in the MSA](https://en.wikipedia.org/wiki/Direct_coupling_analysis).
+* In the first part the alignment results produced with HHBlits are then used to fit a statistical model called Direct-Coupling Analysis ([DCA](https://arxiv.org/pdf/1801.04184.pdf)), in this case indicates with Potts model. [The model aims to find a probability for each sequence that can be interpreted as the probability that the sequence in question belongs to the same class of sequences as the ones in the MSA](https://en.wikipedia.org/wiki/Direct_coupling_analysis).
 
 <p align="center">
   <img src="Figures/dca.PNG" alt="drawing" width="400"/>
 </p>
 
 It should be computed by exploting maximum likehood estimation (ie find the sequnce of aa that maximes the probability) but since it is a computationally complex task usually it is derived by inference. 
-*In the second one there is the network which is composed by a RESNET and some convolutionl layers.
-*In the third one there is an overview of the transformation for the input vector
+* In the second one there is the network which is composed by a RESNET and some convolutionl layers.
+* In the third one there is an overview of the transformation for the input vector
 
 Now we are exlploiting an [updated version](https://github.com/dellacortelab/prospr) of the code, but the main composition is still the same.
 
