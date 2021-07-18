@@ -9,11 +9,13 @@
 - Spiegare le reti utilizzate nel ReadMe
 
 
-# 3DOnco - An oncogenic fusion prediction tool (Adi is editing)
+# 3DOnco - An oncogenic fusion prediction tool (Mari is editing)
 
 <b>The tool is a gene fusion classification algorithm for onco and not onco proteins: starting from 2 chromosomes and their break-points the tool simulates the gene fusion and then predicts the nature of the hybrid protein as oncogenic or not (non è il gene che è oncogenic?) through its 3d structure. </b>
 
-![gene_fusion](Figures/Gene_fusion.PNG)
+<p align="center">
+  <img src="Figures/Gene_fusion.PNG" alt="drawing" width="600"/>
+</p>
 
 # Table of Contents
 
@@ -55,8 +57,9 @@ In this scenario, the coordinates of the base pair at which the 2 genes are fuse
 
 An eukaryotic transcript is characterised by different areas:
 
-![eukariotc transcript](https://s3-us-west-2.amazonaws.com/courses-images/wp-content/uploads/sites/198/2016/11/23232432/Figure_15_03_02.png)
-    
+<p align="center">
+  <img src="https://s3-us-west-2.amazonaws.com/courses-images/wp-content/uploads/sites/198/2016/11/23232432/Figure_15_03_02.png" alt="drawing" width="350"/>
+</p>
 
 
 the ones of interest for our study are the coding DNA sequences (CDS) which are the regions that are transcribed into RNA and translated into proteins. Moreover, a single gene can produce multiple different RNAs due to splicig procedure (?) that are called _transcripts_ and, for each gene, we consider one single transcript that is the longest one; also, if two transcripts have the same length, than we consider the one with the highest number of coding sequences. 
@@ -66,7 +69,9 @@ Building gene fusions sequences requires to consider two important things:
 * it the gene transcribes in the + or in the - strand. In this case the - strand must be reversed and the bases must be substituted with their complementaries, since the databases contain only + strand genes.
 
 With 2 genes and 2 signs this leads to 4 different cases: 
-![cases](Figures/CASES.PNG)
+<p align="center">
+  <img src="Figures/CASES.PNG" alt="drawing" width="550"/>
+</p>
 
 If we consider the 5' gene and it transcribes in the + strand, or the 3' gene that transcribes in the - strand, the portion of the gene that preceeds the breakpoint is selected. 
 
@@ -168,7 +173,9 @@ MALNSELS
 
 # Protein Structure Prediction <a name="psp"></a>
 
-![prot](http://2017.igem.org/wiki/images/6/6d/USTB-SwissMO01.png)
+<p align="center">
+  <img src="http://2017.igem.org/wiki/images/6/6d/USTB-SwissMO01.png" alt="drawing" width="200"/>
+</p>
 
 Protein structure prediction is one of the most interesting tasks in bioinformatics field, since interactions among proteins are ruled principally by their own 3d sturcture. The structure of the protein can be analyzed and considered from four different levels: primary, secondary, tertiary and quaternary. 
 
