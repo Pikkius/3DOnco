@@ -222,14 +222,16 @@ In addition alphafold exploits these information together with a folding algorit
 
 But due to our computational limit we decided to limit our analysis to the study of the distance matrix.
 
-Besides of the distance predictions, ProSPr algorithm also gives as a result some auxiliary predictions which are the secondary structure and the torsion angles. Proteins’ secondary structure determines structural states of local segments of amino acid residues in the protein. The prediction of the secondary structure can be distinguished between 3-state and 8-state predictions. The first kind takes into account three types of secondary structures: alpha helix ('H'), beta-strand ('E') and coil region ('C') which is an irregular state. In this work the DSSP notation is considered that subdivides the previous states in further categories giving rise to eight possible types of secondary structures. Another state is added to represent missing data, for instance the case in which there are no residues in that part of the structure. 
+Besides of the distance predictions, ProSPr algorithm also gives as a result some auxiliary predictions which are the secondary structure and the torsion angles. Proteins’ **secondary structure** determines structural states of local segments of amino acid residues in the protein. The prediction of the secondary structure can be distinguished between 3-state and 8-state predictions. The first kind takes into account three types of secondary structures: alpha helix ('H'), beta-strand ('E') and coil region ('C') which is an irregular state. In this work the DSSP notation is considered that subdivides the previous states in further categories giving rise to eight possible types of secondary structures. Another state is added to represent missing data, for instance the case in which there are no residues in that part of the structure. 
+
+For what concerns the torsion angles, the conformation of the backbone of a peptide chain is determined by the values of the phi and psi angles, which are defined respectively by the rotation around the bond from the alpha carbon to nitrogen and from the alpha carbon to the carbonyl. These angles are discretized into 36 bins from 180° to 180°, so bin includes 10°. Also in this case, another bin is added to take into account gaps.
 
 The algorithm takes as input an a3m file containing the protein profile and gives as output a pkl file with the following keys:
 * Domain: file path
 * Sequence: Primary structure
-* Secondary structure: array of size ( that contains the probability that one aa is part of a secondary structure using [DSSP](https://en.wikipedia.org/wiki/DSSP_(hydrogen_bond_estimation_algorithm)) notation 
-* [Phi angle](https://proteopedia.org/wiki/index.php/Phi_and_Psi_Angles) : torsion angle between alpha carbon
-* [Psi angle](https://proteopedia.org/wiki/index.php/Phi_and_Psi_Angles) : tosion angle between beta carbon
+* Secondary structure: array of size (9, len_seq) that contains the probability that one aa is part of a secondary structure using [DSSP](https://en.wikipedia.org/wiki/DSSP_(hydrogen_bond_estimation_algorithm)) notation 
+* [Phi angle](https://proteopedia.org/wiki/index.php/Phi_and_Psi_Angles) : phi angles array of size (37, len_seq)
+* [Psi angle](https://proteopedia.org/wiki/index.php/Phi_and_Psi_Angles) : psi angles between of size (37, len_seq)
 * Accessible Surface Area ([ASA](https://en.wikipedia.org/wiki/Accessible_surface_area))
 * Network: subdivision of the protein into smaller chunck to be maneged by the model: description for the prediction task parameters
 * Description
