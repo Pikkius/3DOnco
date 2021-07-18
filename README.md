@@ -212,7 +212,7 @@ hhblits -cpu 2 -i ${TARGET_SEQ}.fa -d Project/database/uniclust30_2018_08/uniclu
 
 Deep mind's folding algorithm code for [Alphafold](https://deepmind.com/blog/article/alphafold-a-solution-to-a-50-year-old-grand-challenge-in-biology) is still not available but [ProSPr](https://www.biorxiv.org/content/10.1101/830273v1) enbles us to exploit ..., so we are able to retrieve the distance matrix from each sequence.
 
-<center>![distance matrix](Figures/distance_matrix.png)</center>
+<center> ![distance matrix](Figures/distance_matrix.png) </center>
 
 The matrix represents the probability that amino acid i and j is less than a certain treshold.
 
