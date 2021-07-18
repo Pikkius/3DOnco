@@ -222,10 +222,12 @@ In addition alphafold exploits these information together with a folding algorit
 
 But due to our computational limit we decided to limit our analysis to the study of the distance matrix.
 
+Besides of the distance predictions, ProSPr algorithm also gives as a result some auxiliary predictions which are the secondary structure and the torsion angles. Proteins’ secondary structure determines structural states of local segments of amino acid residues in the protein. The prediction of the secondary structure can be distinguished between 3-state and 8-state predictions. The first kind takes into account three types of secondary structures: alpha helix ('H'), beta-strand ('E') and coil region ('C') which is an irregular state. In this work the DSSP notation is considered that subdivides the previous states in further categories giving rise to eight possible types of secondary structures. Another state is added to represent missing data, for instance the case in which there are no residues in that part of the structure. 
+
 The algorithm takes as input an a3m file containing the protein profile and gives as output a pkl file with the following keys:
-* Domain: path del file
+* Domain: file path
 * Sequence: Primary structure
-* Secondary strcuture: array that contains the probability that one aa is part of a secondary structure using [DSSP](https://en.wikipedia.org/wiki/DSSP_(hydrogen_bond_estimation_algorithm)) notation
+* Secondary structure: array of size ( that contains the probability that one aa is part of a secondary structure using [DSSP](https://en.wikipedia.org/wiki/DSSP_(hydrogen_bond_estimation_algorithm)) notation 
 * [Phi angle](https://proteopedia.org/wiki/index.php/Phi_and_Psi_Angles) : torsion angle between alpha carbon
 * [Psi angle](https://proteopedia.org/wiki/index.php/Phi_and_Psi_Angles) : tosion angle between beta carbon
 * Accessible Surface Area ([ASA](https://en.wikipedia.org/wiki/Accessible_surface_area))
