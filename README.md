@@ -237,8 +237,8 @@ The algorithm takes as input an a3m file containing the protein profile and give
 * Description
 
 And it contains the distance probability matrix in the form:
-* Distribution: array with dimension (seq, seq, dist_bin), it means that 
-* Distribution bins map: list of bins of distance
+* Distance distribution bins map: list of bins of distance
+* Distance distribution: array with dimension (seq, seq, dist_bin), that indicates the probability that each pair of residues has a distance within the range of the bin _i_, considering ten different bins. 
 
 In the following the code to plot the distance matrix:
 
@@ -261,7 +261,7 @@ The algorithm is basically divided into 3 main blocks:
   <img src="Figures/prospr.png" alt="drawing" width="700"/>
 </p>
 
-* In the first part the alignment results produced with HHBlits are then used to fit a statistical model called Direct-Coupling Analysis ([DCA](https://arxiv.org/pdf/1801.04184.pdf)), in this case indicates with Potts model. [The model aims to find a probability for each sequence that can be interpreted as the probability that the sequence in question belongs to the same class of sequences as the ones in the MSA](https://en.wikipedia.org/wiki/Direct_coupling_analysis).
+* In the first part the alignment results produced with HHBlits are then used to fit a statistical model called Direct-Coupling Analysis ([DCA](https://arxiv.org/pdf/1801.04184.pdf)), in this case indicated with Potts model. [The model aims to find a probability for each sequence that can be interpreted as the probability that the sequence in question belongs to the same class of sequences as the ones in the MSA](https://en.wikipedia.org/wiki/Direct_coupling_analysis).
 
 <p align="center">
   <img src="Figures/dca.PNG" alt="drawing" width="400"/>
@@ -278,9 +278,15 @@ In particular, in this version the DCA analysis is substituted with a simpler on
 
 
 On average a protein to complete the HHBlist and Propspr takes 3 hours
-# TDA <a name="tda"></a>
-Now that we have the matrix, we want to be sure that they contains significant pattern for the classification.
+
 # Models <a name="models"></a>
+Now that we have the distance prediction matrices, we want to be sure that they contains significant pattern that allow us to distinguish between oncogenic and not oncogenic fusions. 
+## Topological Data Analysis 
+We can interpret the distance prediction matrices as weight matrices referred to a graph, where the nodes represent the residues and the weights represent the predicted distances between each pair of aminoacids. Using this network structure, we can exploit algebraic topology and topological data analysis to obtain some insights about the properties of these matrices. 
+
+Topological data analysis is a very important tool based on simplicial complexes, which are a generalization of the concept of graph. One of the main application of TDA is simplicial homology, also known as the _theory of holes_, since in simple words its goal is to detect similarities or differences between two objects (simplicial complexes)  by analyzing the holes in their topological structures. 
+
+In particular, we study **persistent homology** which is an algebraic method for discerning topological features of data. 
 ## Neural Network <a name="nn"></a>
 Rete CONV
 LSTM
