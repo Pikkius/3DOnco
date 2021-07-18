@@ -84,6 +84,28 @@ Moreover we have to take into account the **position of the breakpoints**:
 * if the break point is inside a **CDS** for both the genes the transcripts are merged together based on the previous rules;
 * if the breakpoint is inside an **intron** or inside an **Untranslated Region** (UTR) we need to do further considerations.
 
+We can summarize all the cases in the tables below. First, we consider the effects on the 5' gene:
+
+| **Gene**  | **Strand**  |  **BP position**  | **Result**  |
+|---|---|---|---|
+| 5'  | + |   |   |
+| 5'  | + |   |   |
+| 5'  | + |   |   |
+| 5'  | - |   |   |
+| 5'  | - |   |   |
+| 5'  | - |   |   |
+
+Then, we analyze the same situations on the 3' gene:
+
+| **Gene**  | **Strand**  |  **BP position**  | **Result**  |
+|---|---|---|---|
+| 3'  | + |   |   |
+| 3'  | + |   |   |
+| 3'  | + |   |   |
+| 3'  | - |   |   |
+| 3'  | - |   |   |
+| 3'  | - |   |   |
+
 <b>5' gene transcribes with + sign:</b>
 
 * bp into an exon we should stop the transcription of this gene at the preceding CDS.
