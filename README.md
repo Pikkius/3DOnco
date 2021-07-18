@@ -288,6 +288,13 @@ We can interpret the distance prediction matrices as weight matrices referred to
 Topological data analysis is a very important tool based on simplicial complexes, which are a generalization of the concept of graph and are objects built from points, edges, triangular faces, etc. One of the main application of TDA is simplicial homology, also known as the _theory of holes_, since in simple words its goal is to detect similarities or differences between two objects (simplicial complexes) by analyzing the connected components or holes or voids in their topological structures. 
 
 In particular, we study **persistent homology** which is an algebraic method for discerning topological features of data. The idea is that we can consider a point cloud and connect nearby points to construct simplicial complexes. The points are considered near if they are at a distance less than a parameter _d_ and as a result we obtain that we can build simplicial complexes when points start to be linked by edges: for instance, if we have three points pairwise connected we can fill the space among them to build a triangle. At this point, we can use homology to detect holes, but of course the algorithm is strongly affected by the value of the chosen distance. For this reason, we consider all the values of the parameter _d_ observing that hole appears at a particular value and disappears at another value because the space is filled and simplicial complexes are built. Persistent homology has the goal to detect the birth and the death time of each connected component or hole or void in the simplicial complex. 
+
+Persistent homology can be visualized by means of a persistence diagram that is obtained by plotting on the plane that has on the _x_ axis the birth measure and on the _y_ axis the death measure all the points recorded. 
+
+Performing this experiment in our case using the distance matrices, we compute some statistics on the persistence diagrams obtained. In particular, we compute the distribution of the persistences by computing the differences between the death and the birth for each point and the distribution of the birth for each point. 
+
+
+
 ## Neural Network <a name="nn"></a>
 Rete CONV
 LSTM
