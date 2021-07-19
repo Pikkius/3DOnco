@@ -161,3 +161,17 @@ def evaluation(model, dataset, criterion=None, device='cpu'):
         return accuracy, epoch_loss
     else:
         return accuracy
+
+
+def eval_prob(model, dataset, gt=False, device='cpu'):
+    model.train(False)  # Set Network to evaluation mode
+
+    with torch.no_grad():
+        for x in dataset:
+
+            x = [x[i].to(device) for i in range(len(x))]
+            # Forward Pass
+            if gt:
+                yield model(x[:-1])
+            else:
+                yield model(x)
