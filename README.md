@@ -9,19 +9,27 @@
 - Spiegare le reti utilizzate nel ReadMe
 
 
-# 3DOnco - An oncogenic fusion prediction tool (Adi is editing)
+# 3DOnco - An oncogenic fusion prediction tool (Mari is editing)
 
-Starting from 2 chromosomes and their breakpoints the tool simulates the gene fusion and then predicts the nature of the hybrid protein as oncogenic or not (non è il gene che è oncogenic?) through its 3d structure.
+<b>The tool is a gene fusion prioritization algorithm for the classification of oncogenic and not oncogenic proteins: starting from 2 chromosomes and their breakpoints the tool simulates the gene fusion and then predicts the nature of the hybrid protein as oncogenic or not through its 3d structure. </b>
+
+<p align="center">
+  <img src="Figures/Gene_fusion.PNG" alt="drawing" width="600"/>
+</p>
 
 # Table of Contents
 
 - [Data](#Data)
 - [Gene Fusion](#Gene)
+  - [Theory](#theory)
+  - [Class](#class)
 - [Protein Structure Prediction](#psp)
   - [HHBlits](#hhblits)
-  - [DCA](#dca)
   - [ProSPr](#prospr)
 - [Models](#models)
+  - [TDA](#tda)
+  - [Neural Network](#nn)
+  - [Machine Learning](#ml)
 - [Results](#results)
 
 
@@ -29,108 +37,117 @@ Starting from 2 chromosomes and their breakpoints the tool simulates the gene fu
 
 # Data <a name="Data"></a>
 
-For this purpose we used data from [DEEPrior](https://github.com/bioinformatics-polito/DEEPrior), which are contain in a csv file that for each fusion pair contain:
-* Name of the fusion pair
-* Label 1 if oncogenic, 0 otherwise 
-* 5' Gene and break point
-* 3' Gene and break point
 
-That are collected from [COSMIC](https://cancer.sanger.ac.uk/cosmic/fusion) (Catalog of Somatic Mutations in Cancer) for Oncogenic gene fusions and [Babicenau et al. work Recurrent chimeric fusion rnas in non-cancer tissues and cells](https://pubmed.ncbi.nlm.nih.gov/26837576/) for not oncogenic ones.
+For this purpose we used the data from [DEEPrior](https://github.com/bioinformatics-polito/DEEPrior), which are contained in a tab separated file that for each fusion pair gives:
+* Chromosome number of 5p gene
+* Breakpoint coordinate of 5p gene
+* Chromosome number of 3p gene
+* Breakpoint coordinate of 3p gene
 
-Conta quanti sono per classe 
+The gene fusions of the training set are validated and the label values 1 if the fusion is oncogenic, 0 otherwise. 
 
-Mettiamo la distribuzione delle lunghezze ?
+The data of the training set are collected from [COSMIC](https://cancer.sanger.ac.uk/cosmic/fusion) (Catalog of Somatic Mutations in Cancer) for Oncogenic gene fusions and [Babicenau et al. work Recurrent chimeric fusion rnas in non-cancer tissues and cells](https://pubmed.ncbi.nlm.nih.gov/26837576/) for not oncogenic ones. Moreover, we have two different datasets to test the model: 
+
+* the Onco gene fusions of the first one are obtained from the ChimerDB2.0 database, while the Not Onco corresponds to the false positives reported by TopHat-Fusion and STAR-Fusion on Illumina BodyMap 2.0 samples; 
+* the second test set is composed by oncogenic gene fusions built from the work of [Gao et al. Driver fusions and their implications in the development and treatment of human cancers](https://pubmed.ncbi.nlm.nih.gov/29617662/).
+
+In the figures below, we can see the **distribution** of our data:
+- PLOTS DISTRIBUZIONE DATI
+- PLOTS DISTRIBUZIONE LUNGHEZZE
+
 # Gene Fusion <a name="Gene"></a>
 
-# Theory
+## Theory <a name="theory"></a>
 Gene fusions are specific kind of aberrations that happen when parts of two different genes join together as result of a translocation, interstitial deletion or chromosomal inversion. Fusion proteins resulting from the expression of these hybrid genes may lead to the development of different pathologies, especially cancers: in this case the gene under analysis is defined as 'Oncogene'.
 
 In this scenario, the coordinates of the base pair at which the 2 genes are fused together is called breakpoint, so we refer to the gene BEFORE the break point as <b>5' gene </b> and to the gene AFTER the break point as <b>3' gene </b>.
 
 An eukaryotic transcript is characterised by different areas:
-![eukariotc transcript](https://s3-us-west-2.amazonaws.com/courses-images/wp-content/uploads/sites/198/2016/11/23232432/Figure_15_03_02.png)
-    
 
+<p align="center">
+  <img src="https://s3-us-west-2.amazonaws.com/courses-images/wp-content/uploads/sites/198/2016/11/23232432/Figure_15_03_02.png" alt="drawing" width="350"/>
+</p>
 
-the ones of interest for our study are the coding DNA sequences (CDS) which are the regions that are transcribed into RNA and translated into proteins. Moreover, a single gene can produce multiple different RNAs due to splicig procedure (?) that are called _transcripts_ and, for each gene, we consider one single transcript that is the longest one; also, if two transcripts have the same length, than we consider the one with the highest number of coding sequences. 
+The ones of interest for our study are the coding DNA sequences (CDS) which are the regions that are transcribed into RNA and then translated into proteins. Moreover, due to the splicing procedure, a single gene can produce multiple different RNAs that are called _transcripts_: for each gene, we consider one single transcript that is the longest one; also, if two transcripts have the same length, then we consider the one with the highest number of coding sequences. 
 
 Building gene fusions sequences requires to consider two important things:
 * if we are dealing with the 5' gene (first gene of the fusion) or the 3' gene (second gene of the fusion)
 * it the gene transcribes in the + or in the - strand. In this case the - strand must be reversed and the bases must be substituted with their complementaries, since the databases contain only + strand genes.
 
 With 2 genes and 2 signs this leads to 4 different cases: 
-IMMA
+<p align="center">
+  <img src="Figures/CASES.PNG" alt="drawing" width="550"/>
+</p>
 
+If we consider the 5' gene and it transcribes in the + strand, or the 3' gene that transcribes in the - strand, the portion of the gene that preceeds the breakpoint is selected. On the other hand, if we consider the 5' gene that transcribes in the - strand or the 5+ gene that transcribes in the + strand, we take the portion of the gene that follows the breakpoint. 
 
-If we consider the 5' gene and it transcribes in the + strand, or the 3' gene that transcribes in the - strand, the portion of the gene that preceeds the breakpoint is selected. (FAcciamo uno schemino??)
+Moreover we have to take into account the **position of the breakpoints**: 
+* if the break point is inside a **CDS** for both the genes the transcripts are merged together based on the previous rules;
+* if the breakpoint is inside an **intron** or inside an **Untranslated Region** (UTR) we need to do further considerations.
 
-On the other hand, if we consier the 5' gene that transcribes in the - strand or the 5+ gene that transcribes in the + strand, we take the portion of the gene that follows the breakpoint.  (Anche qui??)
+We can summarize all the considerations of the second case in the tables below. First, we consider the effects on the 5' gene:
 
-Moreover we have to take into account the position of the break points. 
+| **Gene**  | **Strand**  |  **BP position**  | **Result**  |
+|---|---|---|---|
+| 5'  | + | intron  | stop the transcription of this gene at the preceding CDS  |
+| 5'  | + | 5' UTR  | take nothing  |
+| 5'  | + | 3' UTR  | take complete gene  |
+| 5'  | - | intron  | stop the transcription of this gene at the following CDS |
+| 5'  | - | 5' UTR  | take complete gene  |
+| 5'  | - | 3' UTR  | take nothing  |
 
-If the break point is inside a CDS for both the genes the transcripts are merged together based on the previous rules.
+Then, we analyze the same situations on the 3' gene:
 
-But we need to be more carefull if the break point is inside an intron or inside an Untranslated Region (UTR):
-SCHEMA
+| **Gene**  | **Strand**  |  **BP position**  | **Result**  |
+|---|---|---|---|
+| 3'  | + | intron  | start the transcription of this gene at the following CDS  |
+| 3'  | + | 5' UTR  | take complete gene  |
+| 3'  | + | 3' UTR  | take nothing  |
+| 3'  | - | intron  | start the transcription of this gene at the preceding CDS  |
+| 3'  | - | 5' UTR  | take nothing  |
+| 3'  | - | 3' UTR  | take complete gene  |
 
-5' gene transcribes with + sign 
+## Class <a name="class"></a>
+CLASS O FUNCTION??? 
 
-bp into an exon we should stop the transcription of this gene at the preceding CDS.
+After the review of the theory that underlines gene fusions, we can consider the class created to reconstruct the protein sequences obtained from the fused genes.  
+(Implemented on Colab gli diamo qualche specifica?
 
-5' UTR --> NULL
-3' UTR --> GENE COMPLETE
+### 1. Filter Genome
 
-5' gene transcribes with - sign 
+First we need to filter the human genome. To do so, we implemented `Gene_Fusion.ipynb` that takes as input a gtf file which contains all the annotated human genome. The algorithm filters the data considering the _ensemble_ notation and gives as a result a correspondence one to one between a gene and its transcript. Since one gene can be associated to more than one transcript due to the splicing mechanims, in this case we selected the longest transcript and, in case of equality, the one that contains more CDS.
+At the end the results is ordered by chromosomes and stored in a csv file.
+The ipynb takes as argument the genome version of the input file coordinates: for semplicity we had already runned the file using GRCH37 and GRCH38. The csv results are inside the folder (NON LO SO), so you don't have to run again this part. For future updatings the time of run is about 20 minutues (di più). GRCH files can be downloaded [here](https://grch37.ensembl.org/info/data/ftp/index.html) and the usage of the function is the following one:
 
-bp into an exon we should stop the transcription of this gene at the following CDS. (perchè stiamo sempre leggendo sul + strand)
+`python Gene_Fusion.py [-i INPUT] [-v VERSION]`
 
-5' UTR --> GENE COMPLETE
-3' UTR --> NULL
-
-3' gene transcribes with + sign 
-
-bp into an exon we should start the transcription of this gene at the following CDS.
-
-5' UTR --> 
-3' UTR --> 
-
-3' gene transcribes with - sign 
-
-bp into an exon we should start the transcription of this gene at the preceding CDS. (perchè stiamo sempre leggendo sul + strand)
-
-5' UTR --> 
-3' UTR --> 
-
-FINE SCHEMA
-
-#FUNCTION
-(Implemented on Colab gli diamo qualche specifica?)
-#FILTER GENOME
-
-Firstly we need to filter the human genome, to do so we implemented `Gene_Fusion.ipyn` that takes in input a gtf file which contains all the genome annotated. The algorithm filter the data considering the ensembl notation and gives as result a correspondence one to one between a gene and its transcript. Since one gene can be associated to more tha one transcript due to splicing mechanims in this case we selected the transcript that contains more CDS.
-At the end the results is ordered by chromosomes and stored in a csv.
-The ipyn takes as input argument the version of the annotation, for semplicity we had already runned the file using GRCH37 and GRCH38. The csv results are inside the folder (NON LO SO), so you don't have to run again this part. For future updatings the time of run is about 20 minutues (di più). GRCH files can be downloaded [here](https://grch37.ensembl.org/info/data/ftp/index.html)
+VA BENE COSÌ??? DOBBIAMO SISTEMARE LA CLASSE
 
 ESEMPIO PER GLI SCEMI ---> ADELA
 
-#GENE FUSION
+### 2. Gene Fusion
 
-We prepared a function to simulate gene fusion in Gene_fusion_Andre.ipyn.
-The script takes as input 2 chromosome and 2 break points and then simulate the gene fusion. The first pair is associated to the 5' gene and the second one to the 3' gene.
-Moreover, the code to run need the gtf files for all the 48 chromosome and the csv file generated in the previous point. You can download the files from LINKS
+We prepared a function to simulate gene fusion in Gene_fusion_Andre.ipynb.
+The script takes as input 2 chromosomes and 2 breakpoints and then simulate the gene fusion. The first pair is associated to the 5' gene and the second one to the 3' gene.
+Moreover, in order to run the code we need the gtf files for all the 48 chromosome and the csv file generated in the previous point. You can download the files from LINKS
 
 As input we utilized the fusion pairs provided in DEEPrior. In any case, the file can take as input any csv file formatted as follow: 
 
-HEADER
+| **Chr5p**  | **Coord5p**  |  **5pStrand**  | **Chr3p**  |  **Coord3p**  |  **3pStrand**  | **Label** |
+|---|---|---|---|---|---|---|
+| 10  | 61665880 | -  | 10  | 43612032 | + | 1 |
+| 21  | 42870046 | -  | 7  | 14017105 | - | 1 |
+| 15  | 63349294 | +  | 14  | 23887486 | - | 0 |
 
-The function gives as ouput a a folder containing a fasta file that represents the protein generated by the fusion. Moreover in the first line of the fasta file is strored:
+
+The function gives as ouput a folder containing a fasta file that represents the protein generated by the fusion. Moreover in the first line of the fasta file is stored:
 * The index of the protein and the name of the fusion pair
-* The label 1 means that the protein is oncogenic, 0 otherwise
+* The label for the training data: 1 means that the protein is oncogenic, 0 otherwise
 
 And for each gene:
 * Chromosome
-* Coordinate of the break point
-* Name of gene under analysis
+* Coordinate of the breakpoint
+* Name of the gene under analysis
 * Sign of transcription
 * Shift (It means the module 3 of the length of the transcript)
 
@@ -139,7 +156,7 @@ Also information about the nature of the fusion are stored:
 * The flag is equal to 1 if the fusion produces a end codone before the end of the transcription
 
 
-Example: (come si mette un riquadro?)
+Example of output fasta file:
 
 ```
 >'nome': '1_TMPRSS2_ERG', 'Label': 1, 'Chr5p': '21', 'Coord5p': 42870046, '5pEnsg': 'ENSG00000184012', '5pStrand': '-', 'Chr3p': '21', 'Coord3p': 39795483, '3pEnsg': 'ENSG00000157554', '3pStrand': '-', 'shift_5': 0, 'shift_3': 1, 'shift_tot': 1, 'flag_end_codon': 1
@@ -147,11 +164,11 @@ Example: (come si mette un riquadro?)
 MALNSELS 
 ```
 
-
-
 # Protein Structure Prediction <a name="psp"></a>
 
-scriviamo di alphafold?
+<p align="center">
+  <img src="http://2017.igem.org/wiki/images/6/6d/USTB-SwissMO01.png" alt="drawing" width="200"/>
+</p>
 
 Protein structure prediction is one of the most interesting tasks in bioinformatics field, since interactions among proteins are ruled principally by their own 3d sturcture. The structure of the protein can be analyzed and considered from four different levels: primary, secondary, tertiary and quaternary. 
 
@@ -180,10 +197,13 @@ After creating the HMM, the HHBlits server iteratively searches through an HMM d
 
 HHBlits is a very fast and sensitive algorithm thanks to a two-stage prefilter phase that reduces the number of database HMMs to be aligned. 
 
-As result it produces an .a3m file that contains the HMM for the sequence and a .hhr file for the details.
+AGGIUNGERE QUALCOSA SU COME FUNZIONA L'OTTIMIZZAZIONE E L'ALGORITMO 
+
+As a result it produces an .a3m file that contains the HMM for the sequence and a .hhr file for the details.
 
 HHBlits was runned on [HPC Polito](https://hpc.polito.it/) using .... (le farei capire che non è stato bello)
-Example: MARINA AIUTO
+
+Example of the usage of the tool: 
 
 ``` 
 hhblits -cpu 2 -i ${TARGET_SEQ}.fa -d Project/database/uniclust30_2018_08/uniclust30_2018_08 -oa3m ${TARGET_SEQ}.a3m -ohhm ${TARGET_SEQ}.hhm -n 3 
@@ -191,25 +211,35 @@ hhblits -cpu 2 -i ${TARGET_SEQ}.fa -d Project/database/uniclust30_2018_08/uniclu
 
 ## ProSPr : Democratized Implementation of Alphafold Protein Distance Prediction Network <a name="prospr"></a>
 
-Deep mind's folding algorithm code for [Alphafold](https://deepmind.com/blog/article/alphafold-a-solution-to-a-50-year-old-grand-challenge-in-biology) is still not available but [ProSPr](https://www.biorxiv.org/content/10.1101/830273v1) enbles us to exploit ..., so we are able to retrive the distance matrix from each sequence.
+Deep mind's folding algorithm code for [Alphafold](https://deepmind.com/blog/article/alphafold-a-solution-to-a-50-year-old-grand-challenge-in-biology) is still not available but [ProSPr](https://www.biorxiv.org/content/10.1101/830273v1) enbles us to exploit ..., so we are able to retrieve the distance matrix from each sequence.
 
-![distance matrix](Figures/distance_matrix.png)
+<p align="center">
+  <img src="Figures/distance_matrix.png" alt="drawing" width="350"/>
+</p>
 
 The matrix represents the probability that amino acid i and j is less than a certain treshold.
 
+In addition alphafold exploits these information together with a folding algorithm (like [Rosetta](https://boinc.bakerlab.org/)) that takes into account electostatic forces, vand der Waals interaction and so on (MARINA HELP). 
+
+But due to our computational limit we decided to limit our analysis to the study of the distance matrix.
+
+Besides of the distance predictions, ProSPr algorithm also gives as a result some auxiliary predictions which are the secondary structure and the torsion angles. Proteins’ **secondary structure** determines structural states of local segments of amino acid residues in the protein. The prediction of the secondary structure can be distinguished between 3-state and 8-state predictions. The first kind takes into account three types of secondary structures: alpha helix ('H'), beta-strand ('E') and coil region ('C') which is an irregular state. In this work the DSSP notation is considered that subdivides the previous states in further categories giving rise to eight possible types of secondary structures. Another state is added to represent missing data, for instance the case in which there are no residues in that part of the structure. 
+
+For what concerns the torsion angles, the conformation of the backbone of a peptide chain is determined by the values of the phi and psi angles, which are defined respectively by the rotation around the bond from the alpha carbon to nitrogen and from the alpha carbon to the carbonyl. These angles are discretized into 36 bins from 180° to 180°, so bin includes 10°. Also in this case, another bin is added to take into account gaps.
+
 The algorithm takes as input an a3m file containing the protein profile and gives as output a pkl file with the following keys:
-* Domain: path del file
+* Domain: file path
 * Sequence: Primary structure
-* Secondary strcuture: array that contains the probability that one aa is part of a secondary structure using [DSSP](https://en.wikipedia.org/wiki/DSSP_(hydrogen_bond_estimation_algorithm)) notation
-* [Phi angle](https://proteopedia.org/wiki/index.php/Phi_and_Psi_Angles) : torsion angle between alpha carbon
-* [Psi angle](https://proteopedia.org/wiki/index.php/Phi_and_Psi_Angles) : tosion angle between beta carbon
+* Secondary structure: array of size (9, len_seq) that contains the probability that one aa is part of a secondary structure using [DSSP](https://en.wikipedia.org/wiki/DSSP_(hydrogen_bond_estimation_algorithm)) notation 
+* [Phi angle](https://proteopedia.org/wiki/index.php/Phi_and_Psi_Angles) : phi angles array of size (37, len_seq)
+* [Psi angle](https://proteopedia.org/wiki/index.php/Phi_and_Psi_Angles) : psi angles between of size (37, len_seq)
 * Accessible Surface Area ([ASA](https://en.wikipedia.org/wiki/Accessible_surface_area))
 * Network: subdivision of the protein into smaller chunck to be maneged by the model: description for the prediction task parameters
 * Description
 
 And it contains the distance probability matrix in the form:
-* Distribution: array with dimension (seq, seq, dist_bin), it means that 
-* Distribution bins map: list of bins of distance
+* Distance distribution bins map: list of bins of distance
+* Distance distribution: array with dimension (seq, seq, dist_bin), that indicates the probability that each pair of residues has a distance within the range of the bin _i_, considering ten different bins. 
 
 In the following the code to plot the distance matrix:
 
@@ -226,20 +256,96 @@ sns.heatmap(distbin,cmap=sns.color_palette("Blues_r", as_cmap=True))
 plt.show()
 ```
 
-## Direct-Coupling Analysis <a name="dca"></a>
-The alignment results produced with HHBlits are then used to fit a statistical model called Direct-Coupling Analysis (DCA). 
+The algorithm is basically divided into 3 main blocks:
+
+<p align="center">
+  <img src="Figures/prospr.png" alt="drawing" width="700"/>
+</p>
+
+* In the first part the alignment results produced with HHBlits are then used to fit a statistical model called Direct-Coupling Analysis ([DCA](https://arxiv.org/pdf/1801.04184.pdf)), in this case indicated with Potts model. [The model aims to find a probability for each sequence that can be interpreted as the probability that the sequence in question belongs to the same class of sequences as the ones in the MSA](https://en.wikipedia.org/wiki/Direct_coupling_analysis).
+
+<p align="center">
+  <img src="Figures/dca.PNG" alt="drawing" width="400"/>
+</p>
+
+It should be computed by exploting maximum likehood estimation (ie find the sequnce of aa that maximes the probability) but since it is a computationally complex task usually it is derived by inference. 
+* In the second one there is the network which is composed by a RESNET and some convolutionl layers.
+* In the third one there is an overview of the transformation for the input vector
+
+Now we are exlploiting an [updated version](https://github.com/dellacortelab/prospr) of the code, but the main composition is still the same.
+
+In particular, in this version the DCA analysis is substituted with a simpler one based on covariance matrix that reduces the computational time called for simplicity ['fast DCA'](https://direct.mit.edu/neco/article/29/11/3040/8328/Sparse-Covariance-Matrix-Estimation-by-DCA-Based).
+
+
 
 On average a protein to complete the HHBlist and Propspr takes 3 hours
 
 # Models <a name="models"></a>
+Now that we have the distance prediction matrices, we want to be sure that they contains significant pattern that allow us to distinguish between oncogenic and not oncogenic fusions. 
+## Topological Data Analysis  <a name="tda"></a>
+We can interpret the distance prediction matrices as weight matrices referred to a graph, where the nodes represent the residues and the weights represent the predicted distances between each pair of aminoacids. Using this network structure, we can exploit algebraic topology and topological data analysis to obtain some insights about the properties of these matrices. 
 
+Topological data analysis is a very important tool based on simplicial complexes, which are a generalization of the concept of graph and are objects built from points, edges, triangular faces, etc. One of the main application of TDA is simplicial homology, also known as the _theory of holes_, since in simple words its goal is to detect similarities or differences between two objects (simplicial complexes) by analyzing the connected components or holes or voids in their topological structures. 
+
+In particular, we study **persistent homology** which is an algebraic method for discerning topological features of data. The idea is that we can consider a point cloud and connect nearby points to construct simplicial complexes. The points are considered near if they are at a distance less than a parameter _d_ and as a result we obtain that we can build simplicial complexes when points start to be linked by edges: for instance, if we have three points pairwise connected we can fill the space among them to build a triangle. At this point, we can use homology to detect holes, but of course the algorithm is strongly affected by the value of the chosen distance. For this reason, we consider all the values of the parameter _d_ observing that hole appears at a particular value and disappears at another value because the space is filled and simplicial complexes are built. Persistent homology has the goal to detect the birth and the death time of each connected component or hole or void in the simplicial complex. 
+
+Persistent homology can be visualized by means of a persistence diagram that is obtained by plotting on the plane that has on the _x_ axis the birth measure and on the _y_ axis the death measure all the points recorded. 
+
+Performing this experiment in our case using the distance matrices, we compute some statistics on the persistence diagrams obtained. In particular, we compute the distribution of the persistences by computing the differences between the death and the birth for each point and the distribution of the birth for each point. 
+
+
+
+## Neural Network <a name="nn"></a>
 Rete CONV
 LSTM
-
+UNA BELLA FIGURA DELLA RETE ???????????????????????????????? 
 a 10 e 1 canale
+## Machine Learning  <a name="ml"></a>
+### 1. Random Forest <a name="rf"></a>
+Random forest is an ensemble machine learning technique that can be exploited both for classification and regression.
+The algorithm consists in many decision trees that predict indipendently and then vote for the result.
+<p align="center">
+  <img src="https://cdn.corporatefinanceinstitute.com/assets/random-forest.png" alt="drawing" width="550"/>
+</p>
 
-RANDOM FOREST
+### 2. SVM <a name="svm"></a>
 
+### Matrix analysis
+For semplicity we transform the 10 channels matrix into a 1 channel matrix, exploiting the code used for visualize it. 
+
+Furthermore, the standard preprocessing is applied so sequences are elongated or cropped in order to achieve the same length of 1000 aa. (lo spieghiamo su)
+
+
+Then the script takes in input the matrix and ,after vectorizing it, perform a gridsearch CV with these parameters:
+```
+'criterion': ["gini", "entropy"]
+'max_features': ["auto", "sqrt", "log2"]
+'random_state': [1]
+'bootstrap': [True, False]
+```
+### Sequence analysis
+
+The same procedure is now proposed using just the protein sequence, so we can see if passing through the 3d structure has lead to an improving of the performances.
+
+Firsly we need to encode the sequences into a [one hot encoding form](https://pdfs.semanticscholar.org/8aeb/ecf42891c94bdddd4eabb1ad5ae0e6700281.pdf?_ga=2.171528992.1835270510.1626557090-1170679748.1626189564).
+
+<p align="center">
+  <img src="Figures/one_hot.PNG" alt="drawing" width="200"/>
+</p>
+
+Then we finetuning the algorithm in the same way.
 # Results <a name="results"></a>
+## Accuracy <a name="results"></a>
 
-CHE SCHIFO 
+Using only the distance matrix and tuning the random forest we achieved an accuracy score of: XXXXXXXXXX
+
+Instead, using only the amino acid sequence we achieved: XXXXXXXXXXXXX
+
+
+## Conclusion <a name="results"></a>
+
+We can see that the 3d strcuture does not lead to a significant improving of the performance of the algorithm. In fact, as states in [Anfinsen's dogma](https://en.wikipedia.org/wiki/Anfinsen%27s_dogma) (sto esagerando?) the strcuture of a protein (at least for the littlest ones) is determined only by its amino acid sequence.
+In this sense, retriving the 3d structure does not add information (???) che sto dicendo, ha senso ?
+Besides, using all these tools to reacreating the 3d strcuture we are propagating error throgh the difefrent algorithm, and in this sense we are .... the data . AIUTO
+
+
