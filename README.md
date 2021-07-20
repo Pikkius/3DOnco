@@ -291,9 +291,24 @@ In particular, we study **persistent homology** which is an algebraic method for
 
 Persistent homology can be visualized by means of a persistence diagram that is obtained by plotting on the plane that has on the _x_ axis the birth measure and on the _y_ axis the death measure all the points recorded. 
 
-Performing this experiment in our case using the distance matrices, we compute some statistics on the persistence diagrams obtained. In particular, we compute the distribution of the persistences by computing the differences between the death and the birth for each point and the distribution of the birth for each point. 
+Performing this experiment in our case using the distance matrices, we compute some statistics on the persistence diagrams obtained. In particular, we compute the distribution of the persistences by computing the differences between the death and the birth for each point and the distribution of the birth for each point. In the end, we obtain the following distributions:
 
+<p align="center">
+  <img src="Figures/plot_pers.png" alt="drawing" width="400"/>
+</p>
 
+<p align="center">
+  <img src="Figures/plot_birth.png" alt="drawing" width="400"/>
+</p>
+
+We can notice that the plots do not give us clear insights about differences in the two distributions. Nevertheless, we try to perform a **Kolmogorov-Smirnov test** to quantify the distance between the two distributions. 
+
+|**distribution**|**p-value**|
+|---|---|
+|persistence|10^(-16)|
+|birth|10^(-29)|
+
+The small p-value indicates that we can reject the null hypothesis that the distributions of the two samples are the same meaning that the topological analysis give us insights about the differences between the topological features of the distance matrices associated to the onco and not onco fusions respectively.
 
 ## Neural Network <a name="nn"></a>
 Rete CONV
