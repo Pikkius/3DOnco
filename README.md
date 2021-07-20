@@ -107,11 +107,10 @@ Then, we analyze the same situations on the 3' gene:
 | 3'  | - | 5' UTR  | take nothing  |
 | 3'  | - | 3' UTR  | take complete gene  |
 
-## Class <a name="class"></a>
-CLASS O FUNCTION??? 
+Moreover, we can have less frequent situations in which the breakpoint is inside an exon on the first gene and outside on the second gene or viceversa. In these two cases, we can have fusions that retrain a piece of intron because of the loss of acceptor or donor sites in one of the two genes.
 
+## Class <a name="class"></a>
 After the review of the theory that underlines gene fusions, we can consider the class created to reconstruct the protein sequences obtained from the fused genes.  
-(Implemented on Colab gli diamo qualche specifica?
 
 ### 1. Filter Genome
 
@@ -121,9 +120,7 @@ The ipynb takes as argument the genome version of the input file coordinates: fo
 
 `python Gene_Fusion.py [-i INPUT] [-v VERSION]`
 
-VA BENE COSÌ??? DOBBIAMO SISTEMARE LA CLASSE
-
-ESEMPIO PER GLI SCEMI ---> ADELA
+DA AGGIUNGERE ALLA CLASSE
 
 ### 2. Gene Fusion
 
@@ -219,7 +216,7 @@ Deep mind's folding algorithm code for [Alphafold](https://deepmind.com/blog/art
 
 The matrix represents the probability that amino acid i and j is less than a certain treshold.
 
-In addition alphafold exploits these information together with a folding algorithm (like [Rosetta](https://boinc.bakerlab.org/)) that takes into account electostatic forces, vand der Waals interaction and so on (MARINA HELP). 
+In addition alphafold exploits these information together with a folding algorithm (like [Rosetta](https://boinc.bakerlab.org/)) that takes into account electostatic forces, vand der Waals interaction and so on. 
 
 But due to our computational limit we decided to limit our analysis to the study of the distance matrix.
 
@@ -323,7 +320,17 @@ The algorithm consists in many decision trees that predict indipendently and the
   <img src="https://cdn.corporatefinanceinstitute.com/assets/random-forest.png" alt="drawing" width="550"/>
 </p>
 
+RESULTS
+
 ### 2. SVM <a name="svm"></a>
+Support Vector Machine is a supervised algorithm that aims at finding the best hyperplane that separates the training data and maximizes the margin, which is the distance between the hyperplane and the closest points from any class called support vectors. It can be used in linear and non-linear classification tasks: in this last case, the kernel trick is exploited to map the data into a higher dimensional space where the classes are linearly separable. However, for computational reasons we just use the linear version of the algorithm.
+
+<p align="center">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Svm_max_sep_hyperplane_with_margin.png" alt="drawing" width="400"/>
+</p>
+
+
+RESULTS
 
 ### Matrix analysis
 For semplicity we transform the 10 channels matrix into a 1 channel matrix, exploiting the code used for visualize it. 
