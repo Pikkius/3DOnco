@@ -322,6 +322,10 @@ Our CNN has two modalities
 * only matrix
 * matrix plus sequence, in this case we only used the one hot encoding version of sequence data.
 
+<p align="center">
+      <img src="Figures/Rete_conv.png" alt="drawing" width="700"/>
+</p>
+
 The model consists in two separate streams that converge into a single linear layer and softmax to perform the classification and gives as output a probability over two classes and the classification is done selecting the class with greather value.
 Each stream cosists in a convolutional layer with maxpool and a linear layer. The matrix branch has two consecutive linear layer and before the second one we linearize the matrix, both branches have the same dimentions and in the end they are summed over and passed to the classifier layer. The model presents batch normalization and dropout at the begging and at the end.
 We recall that the sequence branch is optional, and the model works fine with only the matrix data.
