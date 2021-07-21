@@ -308,8 +308,12 @@ After the first statistical analysis, we proceed with the application of machine
 * distance matrix: the 10 channel matrix is transformed into a 1 channel matrix, exploiting the code used for visualization purposes;
 * protein sequence: we transform the sequences using two kinds of encodings: 
   - **One-hot encoding**: the sequence is transformed into a matrix of dimension (len_seq, n_amino) where the i-th letter is encoded by a vector of all zeros, except for the j-th element associated with the aminoacid which is set to 1;
+    <p align="center">
+      <img src="Figures/one_hot.PNG" alt="drawing" width="200"/>
+    </p>
   - **Word2Vec encoding**: 
 
+Before applying the encoding, in order to have as input sequences of the same size, we first perform two operations: **padding** and **cropping**. We decide to obtain as outputs sequences of size equals 1000, so shorter sequences are padded adding at the end a negative value; on the other hand, longer sequences are cropped starting from a random position.
  
 ## Neural Network <a name="nn"></a>
 Rete CONV
@@ -326,6 +330,8 @@ The algorithm consists in many decision trees that predict indipendently and the
   <img src="https://cdn.corporatefinanceinstitute.com/assets/random-forest.png" alt="drawing" width="550"/>
 </p>
 
+We finetuned the hyperparameters of the algorithm using grid search cross validation with 10 folds and the following set of hyperparameters choices:
+
 ```
 'criterion': ["gini", "entropy"]
 'max_features': ["auto", "sqrt", "log2"]
@@ -340,37 +346,12 @@ Support Vector Machine is a supervised algorithm that aims at finding the best h
   <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Svm_max_sep_hyperplane_with_margin.png" alt="drawing" width="400"/>
 </p>
 
+We finetuned the hyperparameters of the algorithm using grid search cross validation with 10 folds and the following set of hyperparameters choices:
+
  ```
- 
 'C' : [ 0.1, 1, 10, 1000]
-
 ```
 
-
-### Matrix analysis
-For semplicity we transform the 10 channels matrix into a 1 channel matrix, exploiting the code used for visualize it. 
-
-Furthermore, the standard preprocessing is applied so sequences are elongated or cropped in order to achieve the same length of 1000 aa. (lo spieghiamo su)
-
-
-Then the script takes in input the matrix and ,after vectorizing it, perform a gridsearch CV with these parameters:
-```
-'criterion': ["gini", "entropy"]
-'max_features': ["auto", "sqrt", "log2"]
-'random_state': [1]
-'bootstrap': [True, False]
-```
-### Sequence analysis
-
-The same procedure is now proposed using just the protein sequence, so we can see if passing through the 3d structure has lead to an improving of the performances.
-
-Firsly we need to encode the sequences into a [one hot encoding form](https://pdfs.semanticscholar.org/8aeb/ecf42891c94bdddd4eabb1ad5ae0e6700281.pdf?_ga=2.171528992.1835270510.1626557090-1170679748.1626189564).
-
-<p align="center">
-  <img src="Figures/one_hot.PNG" alt="drawing" width="200"/>
-</p>
-
-Then we finetuning the algorithm in the same way.
 # Results <a name="results"></a>
 ## Accuracy <a name="results"></a>
 
