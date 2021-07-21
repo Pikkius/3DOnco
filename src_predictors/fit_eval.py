@@ -147,7 +147,6 @@ def evaluation(model, dataset, config, criterion=None):
             tot_loss += loss.item() * x[0].size(0)
 
     # Calculate Accuracy
-    print(running_corrects, float(len(dataset)), len(dataset))
     accuracy = running_corrects / float(len(dataset))
 
     if criterion is not None:
