@@ -311,7 +311,7 @@ After the first statistical analysis, we proceed with the application of machine
     <p align="center">
       <img src="Figures/one_hot.PNG" alt="drawing" width="200"/>
     </p>
-  - **Word2Vec encoding**: 
+  - **Word2Vec encoding**:  Word2Vec is an encoding typical of Natural Language Processing. Following the example of [ProtVec](https://arxiv.org/ftp/arxiv/papers/1503/1503.05140.pdf), each sequence is broken into trigrams that are then used to train the algorithm. In particular, Word2Vec is a one layer neural network that takes in input one trigram and gives as output the probability of each of the other ones to be near the target. The hidden layer is 100, and it represents the features we are using. So at the end each sequence will be represented by a vector of 100 elements that is the sum of all the arrays of its trigrams.
 
 Before applying the encoding, in order to have as input sequences of the same size, we first perform two operations: **padding** and **cropping**. We decide to obtain as outputs sequences of size equals 1000, so shorter sequences are padded adding at the end a negative value; on the other hand, longer sequences are cropped starting from a random position.
  
