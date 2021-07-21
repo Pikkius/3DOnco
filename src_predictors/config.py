@@ -6,7 +6,7 @@ import shutil
 
 class Config:
     DEVICE = 'cpu'
-    BATCH_SIZE = 1
+    BATCH_SIZE = 3
 
     save_out = True
     save_graph = True
@@ -17,6 +17,8 @@ class Config:
     STEP_SIZE = 20
     GAMMA = 0.1
     LOG_FREQUENCY = 20
+    inputs_voc = 20
+    hidden_dim = 8
 
     NET = None
     netkargs= None

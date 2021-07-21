@@ -14,10 +14,9 @@ from torch.utils.data import DataLoader
 
 def Train(train_set, val_set, config):
     train_dataloader = DataLoader(train_set, batch_size=config.BATCH_SIZE, shuffle=True, num_workers=0, drop_last=False)
-    val_dataloader = DataLoader(val_set, batch_size=config.BATCH_SIZE, shuffle=False, num_workers=0, drop_last=False)
 
     if config.NET == model_3DOnco:
-        net = config.NET('conv', config.inputs_voc, config.hidden_dim, config.SEQ_LEN)
+        net = config.NET(config.hidden_dim, config.SEQ_LEN,  'conv', config.inputs_voc)
         net = net.to(config.DEVICE)
     elif config.NET == attentionLSTM:
         net = config.NET()
@@ -84,7 +83,7 @@ def Train(train_set, val_set, config):
         acc_list_train.append(train_accuracy)
 
         # Calculate Accuracy and loss on val
-        val_accuracy, epoch_val_loss = evaluation(net, val_dataloader, criterion=criterion, device=config.DEVICE)
+        val_accuracy, epoch_val_loss = evaluation(net, val_set, config, criterion=criterion)
 
         loss_list_val.append(epoch_val_loss)
         acc_list_val.append(val_accuracy)
@@ -121,39 +120,34 @@ def Train(train_set, val_set, config):
     return best_net
 
 
-def Test(test_set, model, batch):
-    test_dataloader = DataLoader(test_set, batch_size=batch, shuffle=False, num_workers=0)
-
-    return evaluation(model, test_dataloader)
-
-
-def evaluation(model, dataset, criterion=None, device='cpu'):
+def evaluation(model, dataset, config, criterion=None):
     model.train(False)  # Set Network to evaluation mode
     running_corrects = 0
     tot_loss = 0
+    val_dataloader = DataLoader(dataset, batch_size=config.BATCH_SIZE, shuffle=False, num_workers=0, drop_last=False)
 
-    with torch.no_grad():
-        for x in dataset:
+    for x in val_dataloader:
 
-            x = [x[i].to(device) for i in range(len(x))]
+        x = [x[i].to(config.DEVICE) for i in range(len(x))]
 
-            # Forward Pass
-            outputs = model(x[:-1])
+        # Forward Pass
+        outputs = model(x[:-1])
 
-            # Compute loss based on output and ground truth
-            if criterion is not None:
-                loss = criterion(outputs, x[-1])
+        # Compute loss based on output and ground truth
+        if criterion is not None:
+            loss = criterion(outputs, x[-1])
 
-            # Get predictions
-            _, preds = torch.max(outputs.data, 1)
+        # Get predictions
+        _, preds = torch.max(outputs.data, 1)
 
-            # Update Corrects
-            running_corrects += torch.sum(preds == x[-1].data).data.item()
+        # Update Corrects
+        running_corrects += torch.sum(preds == x[-1].data).data.item()
 
-            if criterion is not None:
-                tot_loss += loss.item() * x[0].size(0)
+        if criterion is not None:
+            tot_loss += loss.item() * x[0].size(0)
 
     # Calculate Accuracy
+    print(running_corrects, float(len(dataset)), len(dataset))
     accuracy = running_corrects / float(len(dataset))
 
     if criterion is not None:
