@@ -362,15 +362,25 @@ We finetuned the hyperparameters of the algorithm using grid search cross valida
 ```
 
 Using the matrix as input data we achieved on the validation set the accuracy of: **0.90%**
-![rf_matrix1](Figures/conf_matrix_rf.png)
+
+<p align="center">
+  <img src="Figures/conf_matrix_rf.png" alt="drawing" width="350"/>
+</p>
+
 That leads to **0.87%** of accuracy on the test set.
 
 Using the one hot encoded sequences as input data we achieved on the validation set the accuracy of: **0.87**
-![rf_matrix2](Figures/conf_seq_rf.png)
+<p align="center">
+  <img src="Figures/conf_seq_rf.png" alt="drawing" width="350"/>
+</p>
+
 That leads to **0.90%** of accuracy on the test set.
 
 Using the one Word2Vec sequences as input data we achieved on the validation set the accuracy of: **0.930**
-![rf_matrix3](Figures/conf_seq_rf.png)
+<p align="center">
+  <img src="Figures/conf_enc_rf.png" alt="drawing" width="350"/>
+</p>
+
 That leads to **0.91%** of accuracy on the test set.
 
 ### 2. SVM <a name="svm"></a>
