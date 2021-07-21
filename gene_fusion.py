@@ -70,7 +70,8 @@ class gene_fusion:
                        'Chr3p': 0, 'Coord3p': 0, '3pEnsg': 0, '3pStrand': False, 'intron_3': False,
                        'shift_5': 0, 'shift_3': 0, 'shift_tot': 0, 'flag_end_codon': 0}
 
-    def load_tablet(self):
+    def load_tablet(self, dataset_path=None):
+        self.dataset_path = dataset_path
         self.table = pd.read_csv(self.dataset_path, sep='\t', index_col=0)
 
     def load_data(self, data_path):
@@ -185,13 +186,9 @@ class gene_fusion:
         mask_in = ((self.data['Chr'] == chromosome) & (self.data['Start_T'] < bp) & (self.data['End_T'] > bp))
         return set(self.data[mask_in]['Gene'])
 
-    def gene_seq_retrival(self, gene, introne, flag5):  # 1--> 5, 0-->3
+    def gene_seq_retrival(self, gene_dataframe, introne, flag5):  # 1--> 5, 0-->3
 
         chromosome = self.config['Chr5p'] if flag5 else self.config['Chr3p']
-
-        gene_dataframe = self.filter_dataframe(gene, flag5)
-        if len(gene_dataframe) == 0:
-            return " "
 
         sign = self.config['5pStrand'] if flag5 else self.config['3pStrand']
 
@@ -200,18 +197,15 @@ class gene_fusion:
                 DNA = self.retrive_sequence_dna(gene_dataframe.iloc[0]['Start'] - 1, self.config['Coord5p'],
                                                 chromosome)  # zip version is for files still compressed
                 start = gene_dataframe.iloc[0]['Start']
-                end = self.config['Coord5p']
             else:
                 DNA = self.retrive_sequence_dna(self.config['Coord3p'] - 1, gene_dataframe.iloc[-1]['End'],
                                                 chromosome)  # zip version is for files still compressed
                 start = self.config['Coord3p']
-                end = gene_dataframe.iloc[-1]['End']
         # Load Chromosome DNA
         else:
             DNA = self.retrive_sequence_dna(gene_dataframe.iloc[0]['Start'] - 1, gene_dataframe.iloc[-1]['End'],
                                         chromosome)  # zip version is for files still compressed
             start = gene_dataframe.iloc[0]['Start']
-            end = gene_dataframe.iloc[-1]['End']
 
         part = []
         n = len(gene_dataframe)
