@@ -303,6 +303,14 @@ We can notice that the plots do not give us clear insights about differences in 
 
 The small p-value indicates that we can reject the null hypothesis that the distributions of the two samples are the same meaning that the topological analysis give us insights about the differences between the topological features of the distance matrices associated to the onco and not onco fusions respectively.
 
+## Classifiers algorithms
+After the first statistical analysis, we proceed with the application of machine learning and deep learning algorithms. We fed the models with two types of input:
+* distance matrix: the 10 channel matrix is transformed into a 1 channel matrix, exploiting the code used for visualization purposes;
+* protein sequence: we transform the sequences using two kinds of encodings: 
+  - **One-hot encoding**: the sequence is transformed into a matrix of dimension (len_seq, n_amino) where the i-th letter is encoded by a vector of all zeros, except for the j-th element associated with the aminoacid which is set to 1;
+  - **Word2Vec encoding**: 
+
+ 
 ## Neural Network <a name="nn"></a>
 Rete CONV
 LSTM
