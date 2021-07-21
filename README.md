@@ -196,7 +196,7 @@ HHBlits is a very fast and sensitive algorithm thanks to a two-stage prefilter p
 
 As a result it produces an .a3m file that contains the HMM for the sequence and a .hhr file for the details.
 
-HHBlits was runned on [HPC Polito](https://hpc.polito.it/) using .... (le farei capire che non è stato bello)
+HHBlits was runned on [HPC Polito](https://hpc.polito.it/).
 
 Example of the usage of the tool: 
 
@@ -316,14 +316,17 @@ After the first statistical analysis, we proceed with the application of machine
 Before applying the encoding, in order to have as input sequences of the same size, we first perform two operations: **padding** and **cropping**. We decide to obtain as outputs sequences of size equals 1000, so shorter sequences are padded adding at the end a negative value; on the other hand, longer sequences are cropped starting from a random position.
  
 ## Neural Network <a name="nn"></a>
-We first tried using convolutional network as CNN can exploite the sequential nature of our data  
-Our CNN has two modalities, only matrix, and matrix plus sequence, in this case we only used the one hot encoding version of sequence data.
-The model consist in two separate streams that converge into a single linear layer and softmax to perform the classification. The model output is a probability over two classes and the predicition is done selecting the class with greather value.
-Each stream cosist in a convolutional layer with maxpool and a linear layer. The matrix branch has two consecutive linear layer before the second one we linearize the matrix.
-Both branches follow the same dimention and in the end are summed over and passed to the classifier layer. The model presents batch normalization and dropout at the begging and at the end.
+We first tried to use a convolutional network neural network (CNN) which is an architecture thta can exploit well the sequential nature of our data.
+
+Our CNN has two modalities 
+*only matrix
+*matrix plus sequence, in this case we only used the one hot encoding version of sequence data.
+
+The model consists in two separate streams that converge into a single linear layer and softmax to perform the classification and gives as output a probability over two classes and the classification is done selecting the class with greather value.
+Each stream cosists in a convolutional layer with maxpool and a linear layer. The matrix branch has two consecutive linear layer and before the second one we linearize the matrix, both branches have the same dimentions and in the end they are summed over and passed to the classifier layer. The model presents batch normalization and dropout at the begging and at the end.
 We recall that the sequence branch is optional, and the model works fine with only the matrix data.
 
-The model can be customize with different starting hidden layer dimention. The dimention of hte network it expands untili it reaches the lcassifier that compress the rappresentation before appling a softmax fuction.
+The model can be customize with different starting hidden layer dimention. The dimention of the network expands untili it reaches the cassifier that compress the rappresentation before appling a softmax fuction.
 
 
 ## Machine Learning  <a name="ml"></a>
