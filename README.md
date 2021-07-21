@@ -326,13 +326,22 @@ The algorithm consists in many decision trees that predict indipendently and the
   <img src="https://cdn.corporatefinanceinstitute.com/assets/random-forest.png" alt="drawing" width="550"/>
 </p>
 
+```
+'criterion': ["gini", "entropy"]
+'max_features': ["auto", "sqrt", "log2"]
+'random_state': [1]
+'bootstrap': [True, False]
+```
+
 ### 2. SVM <a name="svm"></a>
 Support Vector Machine is a supervised algorithm that aims at finding the best hyperplane that separates the training data and maximizes the margin, which is the distance between the hyperplane and the closest points from any class called support vectors. It can be used in linear and non-linear classification tasks: in this last case, the kernel trick is exploited to map the data into a higher dimensional space where the classes are linearly separable. However, for computational reasons we just use the linear version of the algorithm.
 
 <p align="center">
   <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Svm_max_sep_hyperplane_with_margin.png" alt="drawing" width="400"/>
 </p>
-
+ ```
+'C' : [ 0.1, 1, 10, 1000]
+```
 
 
 ### Matrix analysis
