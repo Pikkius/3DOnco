@@ -339,8 +339,11 @@ Support Vector Machine is a supervised algorithm that aims at finding the best h
 <p align="center">
   <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Svm_max_sep_hyperplane_with_margin.png" alt="drawing" width="400"/>
 </p>
+
  ```
+ 
 'C' : [ 0.1, 1, 10, 1000]
+
 ```
 
 
