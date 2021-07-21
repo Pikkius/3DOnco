@@ -319,8 +319,8 @@ Before applying the encoding, in order to have as input sequences of the same si
 We first tried to use a convolutional network neural network (CNN) which is an architecture thta can exploit well the sequential nature of our data.
 
 Our CNN has two modalities 
-*only matrix
-*matrix plus sequence, in this case we only used the one hot encoding version of sequence data.
+* only matrix
+* matrix plus sequence, in this case we only used the one hot encoding version of sequence data.
 
 The model consists in two separate streams that converge into a single linear layer and softmax to perform the classification and gives as output a probability over two classes and the classification is done selecting the class with greather value.
 Each stream cosists in a convolutional layer with maxpool and a linear layer. The matrix branch has two consecutive linear layer and before the second one we linearize the matrix, both branches have the same dimentions and in the end they are summed over and passed to the classifier layer. The model presents batch normalization and dropout at the begging and at the end.
