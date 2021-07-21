@@ -194,8 +194,6 @@ After creating the HMM, the HHBlits server iteratively searches through an HMM d
 
 HHBlits is a very fast and sensitive algorithm thanks to a two-stage prefilter phase that reduces the number of database HMMs to be aligned. 
 
-AGGIUNGERE QUALCOSA SU COME FUNZIONA L'OTTIMIZZAZIONE E L'ALGORITMO 
-
 As a result it produces an .a3m file that contains the HMM for the sequence and a .hhr file for the details.
 
 HHBlits was runned on [HPC Polito](https://hpc.polito.it/) using .... (le farei capire che non è stato bello)
@@ -273,9 +271,7 @@ Now we are exlploiting an [updated version](https://github.com/dellacortelab/pro
 
 In particular, in this version the DCA analysis is substituted with a simpler one based on covariance matrix that reduces the computational time called for simplicity ['fast DCA'](https://direct.mit.edu/neco/article/29/11/3040/8328/Sparse-Covariance-Matrix-Estimation-by-DCA-Based).
 
-
-
-On average a protein to complete the HHBlist and Propspr takes 3 hours
+On average a protein to complete the HHBlist and Propspr takes 3 hours.
 
 # Models <a name="models"></a>
 Now that we have the distance prediction matrices, we want to be sure that they contains significant pattern that allow us to distinguish between oncogenic and not oncogenic fusions. 
@@ -307,12 +303,26 @@ We can notice that the plots do not give us clear insights about differences in 
 
 The small p-value indicates that we can reject the null hypothesis that the distributions of the two samples are the same meaning that the topological analysis give us insights about the differences between the topological features of the distance matrices associated to the onco and not onco fusions respectively.
 
+## Classifiers algorithms
+After the first statistical analysis, we proceed with the application of machine learning and deep learning algorithms. We fed the models with two types of input:
+* distance matrix: the 10 channel matrix is transformed into a 1 channel matrix, exploiting the code used for visualization purposes;
+* protein sequence: we transform the sequences using two kinds of encodings: 
+  - **One-hot encoding**: the sequence is transformed into a matrix of dimension (len_seq, n_amino) where the i-th letter is encoded by a vector of all zeros, except for the j-th element associated with the aminoacid which is set to 1;
+    <p align="center">
+      <img src="Figures/one_hot.PNG" alt="drawing" width="200"/>
+    </p>
+  - **Word2Vec encoding**: 
+
+Before applying the encoding, in order to have as input sequences of the same size, we first perform two operations: **padding** and **cropping**. We decide to obtain as outputs sequences of size equals 1000, so shorter sequences are padded adding at the end a negative value; on the other hand, longer sequences are cropped starting from a random position.
+ 
 ## Neural Network <a name="nn"></a>
 Rete CONV
 LSTM
 UNA BELLA FIGURA DELLA RETE ???????????????????????????????? 
 a 10 e 1 canale
 ## Machine Learning  <a name="ml"></a>
+After our attempts with deep learning, we tried to apply Machine Learning techniques both on the protein sequences and on the distance matrix flattened. For the protein sequences, we performed two types of encoding in order to give a proper input to the classifiers.
+
 ### 1. Random Forest <a name="rf"></a>
 Random forest is an ensemble machine learning technique that can be exploited both for classification and regression.
 The algorithm consists in many decision trees that predict indipendently and then vote for the result.
@@ -320,7 +330,14 @@ The algorithm consists in many decision trees that predict indipendently and the
   <img src="https://cdn.corporatefinanceinstitute.com/assets/random-forest.png" alt="drawing" width="550"/>
 </p>
 
-RESULTS
+We finetuned the hyperparameters of the algorithm using grid search cross validation with 10 folds and the following set of hyperparameters choices:
+
+```
+'criterion': ["gini", "entropy"]
+'max_features': ["auto", "sqrt", "log2"]
+'random_state': [1]
+'bootstrap': [True, False]
+```
 
 ### 2. SVM <a name="svm"></a>
 Support Vector Machine is a supervised algorithm that aims at finding the best hyperplane that separates the training data and maximizes the margin, which is the distance between the hyperplane and the closest points from any class called support vectors. It can be used in linear and non-linear classification tasks: in this last case, the kernel trick is exploited to map the data into a higher dimensional space where the classes are linearly separable. However, for computational reasons we just use the linear version of the algorithm.
@@ -329,33 +346,12 @@ Support Vector Machine is a supervised algorithm that aims at finding the best h
   <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Svm_max_sep_hyperplane_with_margin.png" alt="drawing" width="400"/>
 </p>
 
+We finetuned the hyperparameters of the algorithm using grid search cross validation with 10 folds and the following set of hyperparameters choices:
 
-RESULTS
-
-### Matrix analysis
-For semplicity we transform the 10 channels matrix into a 1 channel matrix, exploiting the code used for visualize it. 
-
-Furthermore, the standard preprocessing is applied so sequences are elongated or cropped in order to achieve the same length of 1000 aa. (lo spieghiamo su)
-
-
-Then the script takes in input the matrix and ,after vectorizing it, perform a gridsearch CV with these parameters:
+ ```
+'C' : [ 0.1, 1, 10, 1000]
 ```
-'criterion': ["gini", "entropy"]
-'max_features': ["auto", "sqrt", "log2"]
-'random_state': [1]
-'bootstrap': [True, False]
-```
-### Sequence analysis
 
-The same procedure is now proposed using just the protein sequence, so we can see if passing through the 3d structure has lead to an improving of the performances.
-
-Firsly we need to encode the sequences into a [one hot encoding form](https://pdfs.semanticscholar.org/8aeb/ecf42891c94bdddd4eabb1ad5ae0e6700281.pdf?_ga=2.171528992.1835270510.1626557090-1170679748.1626189564).
-
-<p align="center">
-  <img src="Figures/one_hot.PNG" alt="drawing" width="200"/>
-</p>
-
-Then we finetuning the algorithm in the same way.
 # Results <a name="results"></a>
 ## Accuracy <a name="results"></a>
 
