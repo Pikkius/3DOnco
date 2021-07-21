@@ -367,21 +367,21 @@ Using the matrix as input data we achieved on the validation set the accuracy of
   <img src="Figures/conf_matrix_rf.png" alt="drawing" width="350"/>
 </p>
 
-That leads to **0.87%** of accuracy on the test set.
+That leads to **0.87%** of accuracy on the test set, as we cann notice in the confusion matrix.
 
 Using the one hot encoded sequences as input data we achieved on the validation set the accuracy of: **0.87**
 <p align="center">
   <img src="Figures/conf_seq_rf.png" alt="drawing" width="350"/>
 </p>
 
-That leads to **0.90%** of accuracy on the test set.
+That leads to **0.90%** of accuracy on the test set, as we cann notice in the confusion matrix.
 
 Using the one Word2Vec sequences as input data we achieved on the validation set the accuracy of: **0.930**
 <p align="center">
   <img src="Figures/conf_enc_rf.png" alt="drawing" width="350"/>
 </p>
 
-That leads to **0.91%** of accuracy on the test set.
+That leads to **0.91%** of accuracy on the test set, as we cann notice in the confusion matrix.
 
 ### 2. SVM <a name="svm"></a>
 Support Vector Machine is a supervised algorithm that aims at finding the best hyperplane that separates the training data and maximizes the margin, which is the distance between the hyperplane and the closest points from any class called support vectors. It can be used in linear and non-linear classification tasks: in this last case, the kernel trick is exploited to map the data into a higher dimensional space where the classes are linearly separable. However, for computational reasons we just use the linear version of the algorithm.
@@ -396,7 +396,19 @@ We finetuned the hyperparameters of the algorithm using grid search cross valida
 'C' : [ 0.1, 1, 10, 1000]
 ```
 
+Using the one hot encoded sequences as input data we achieved on the validation set the accuracy of: **0.86%**
+<p align="center">
+  <img src="Figures/conf_seq_linearsvc.png" alt="drawing" width="350"/>
+</p>
 
+That leads to **0.90%** of accuracy on the test set, as we cann notice in the confusion matrix.
+
+Using the one Word2Vec sequences as input data we achieved on the validation set the accuracy of: **0.89%**
+<p align="center">
+  <img src="Figures/conf_enc_linearsvc.png" alt="drawing" width="350"/>
+</p>
+
+That leads to **0.89%** of accuracy on the test set, as we cann notice in the confusion matrix.
 
 # Results <a name="results"></a>
 ## Accuracy <a name="results"></a>
@@ -413,10 +425,13 @@ This might be due also to the error propagation trough the networks that is gene
 
 ## Conclusion <a name="results"></a>
 
-We can see that the 3d strcuture does not lead to a significant improving of the performance of the algorithm. In fact, as states in [Anfinsen's dogma](https://en.wikipedia.org/wiki/Anfinsen%27s_dogma) (sto esagerando?) the strcuture of a protein (at least for the littlest ones) is determined only by its amino acid sequence.
-In this sense, retriving the 3d structure does not add information (???) che sto dicendo, ha senso ?
-Besides, using all these tools to reacreating the 3d strcuture we are propagating error throgh the difefrent algorithm, and in this sense we are .... the data . AIUTO
+Our work addresses the need for an easy class that filters the best transcript over ensemble or Havana annotations over the dataset of human genome, moreover the class performs genefusion simulation with an arbitrary gene and break points.
 
+We also test this class on deePrior dataset and then we use the newly genereted sequence data to perform gene prioritization over oncogenes.
+We also penrich our data thanks to Uniprot30, that enchants the algorithm and try to perform gene prioritization with developed 3D data of the protein.
 
+We apply different techniques to classify the data and, as we can also in other binary classification task, NN aren't the only choice. We can also just use them to perform simple data preprocessing and features extraction and then revert back to ML algorithm that are easier to tune and deeploy reaching still optimal results.
+
+At the end, exploiting the 3d structure of the protein is not yet feasible as the algorithms that provide this structure have not reached optimal results, and the efforts due to computational complexity and memory storage are not worth in terms of accuracy.
 
 
