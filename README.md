@@ -194,8 +194,6 @@ After creating the HMM, the HHBlits server iteratively searches through an HMM d
 
 HHBlits is a very fast and sensitive algorithm thanks to a two-stage prefilter phase that reduces the number of database HMMs to be aligned. 
 
-AGGIUNGERE QUALCOSA SU COME FUNZIONA L'OTTIMIZZAZIONE E L'ALGORITMO 
-
 As a result it produces an .a3m file that contains the HMM for the sequence and a .hhr file for the details.
 
 HHBlits was runned on [HPC Polito](https://hpc.polito.it/) using .... (le farei capire che non è stato bello)
@@ -273,9 +271,7 @@ Now we are exlploiting an [updated version](https://github.com/dellacortelab/pro
 
 In particular, in this version the DCA analysis is substituted with a simpler one based on covariance matrix that reduces the computational time called for simplicity ['fast DCA'](https://direct.mit.edu/neco/article/29/11/3040/8328/Sparse-Covariance-Matrix-Estimation-by-DCA-Based).
 
-
-
-On average a protein to complete the HHBlist and Propspr takes 3 hours
+On average a protein to complete the HHBlist and Propspr takes 3 hours.
 
 # Models <a name="models"></a>
 Now that we have the distance prediction matrices, we want to be sure that they contains significant pattern that allow us to distinguish between oncogenic and not oncogenic fusions. 
@@ -313,14 +309,14 @@ LSTM
 UNA BELLA FIGURA DELLA RETE ???????????????????????????????? 
 a 10 e 1 canale
 ## Machine Learning  <a name="ml"></a>
+After our attempts with deep learning, we tried to apply Machine Learning techniques both on the protein sequences and on the distance matrix flattened. For the protein sequences, we performed two types of encoding in order to give a proper input to the classifiers.
+
 ### 1. Random Forest <a name="rf"></a>
 Random forest is an ensemble machine learning technique that can be exploited both for classification and regression.
 The algorithm consists in many decision trees that predict indipendently and then vote for the result.
 <p align="center">
   <img src="https://cdn.corporatefinanceinstitute.com/assets/random-forest.png" alt="drawing" width="550"/>
 </p>
-
-RESULTS
 
 ### 2. SVM <a name="svm"></a>
 Support Vector Machine is a supervised algorithm that aims at finding the best hyperplane that separates the training data and maximizes the margin, which is the distance between the hyperplane and the closest points from any class called support vectors. It can be used in linear and non-linear classification tasks: in this last case, the kernel trick is exploited to map the data into a higher dimensional space where the classes are linearly separable. However, for computational reasons we just use the linear version of the algorithm.
@@ -330,7 +326,6 @@ Support Vector Machine is a supervised algorithm that aims at finding the best h
 </p>
 
 
-RESULTS
 
 ### Matrix analysis
 For semplicity we transform the 10 channels matrix into a 1 channel matrix, exploiting the code used for visualize it. 
