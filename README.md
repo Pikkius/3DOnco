@@ -316,12 +316,18 @@ After the first statistical analysis, we proceed with the application of machine
 Before applying the encoding, in order to have as input sequences of the same size, we first perform two operations: **padding** and **cropping**. We decide to obtain as outputs sequences of size equals 1000, so shorter sequences are padded adding at the end a negative value; on the other hand, longer sequences are cropped starting from a random position.
  
 ## Neural Network <a name="nn"></a>
-Rete CONV
-LSTM
-UNA BELLA FIGURA DELLA RETE ???????????????????????????????? 
-a 10 e 1 canale
+We first tried using convolutional network as CNN can exploite the sequential nature of our data  
+Our CNN has two modalities, only matrix, and matrix plus sequence, in this case we only used the one hot encoding version of sequence data.
+The model consist in two separate streams that converge into a single linear layer and softmax to perform the classification. The model output is a probability over two classes and the predicition is done selecting the class with greather value.
+Each stream cosist in a convolutional layer with maxpool and a linear layer. The matrix branch has two consecutive linear layer before the second one we linearize the matrix.
+Both branches follow the same dimention and in the end are summed over and passed to the classifier layer. The model presents batch normalization and dropout at the begging and at the end.
+We recall that the sequence branch is optional, and the model works fine with only the matrix data.
+
+The model can be customize with different starting hidden layer dimention. The dimention of hte network it expands untili it reaches the lcassifier that compress the rappresentation before appling a softmax fuction.
+
+
 ## Machine Learning  <a name="ml"></a>
-After our attempts with deep learning, we tried to apply Machine Learning techniques both on the protein sequences and on the distance matrix flattened. For the protein sequences, we performed two types of encoding in order to give a proper input to the classifiers.
+After our attempt with deep learning, we tried to apply Machine Learning techniques both on the protein sequences and on the distance matrix flattened. For the protein sequences, we performed two types of encoding in order to give a proper input to the classifiers.
 
 ### 1. Random Forest <a name="rf"></a>
 Random forest is an ensemble machine learning technique that can be exploited both for classification and regression.
