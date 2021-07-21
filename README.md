@@ -1,14 +1,3 @@
-# TO DO LIST
-- Tunare le reti (?)
-- Uniformare input reti ad solo channel matrix e optional seq
-- Schemini genefusion nel ReadMe
-- Creazione classe genefusion
-- Merge dei vari branch
-- Runnare experiments
-- Schematizzare i results nel ReadMe
-- Spiegare le reti utilizzate nel ReadMe
-
-
 # 3DOnco - An oncogenic fusion prediction tool (Mari is editing)
 
 <b>The tool is a gene fusion prioritization algorithm for the classification of oncogenic and not oncogenic proteins: starting from 2 chromosomes and their breakpoints the tool simulates the gene fusion and then predicts the nature of the hybrid protein as oncogenic or not through its 3d structure. </b>
@@ -112,15 +101,23 @@ Moreover, we can have less frequent situations in which the breakpoint is inside
 ## Class <a name="class"></a>
 After the review of the theory that underlines gene fusions, we can consider the class created to reconstruct the protein sequences obtained from the fused genes.  
 
+This is the command to run the class:
+
+```
+import treDOnco.gene_fusion as gf
+gf0= gf.gene_fusion(GRCh_chromosomes_path,out_dir)
+gf0.load_tablet(input_path)
+gf0.load_data(filter_genome_path)
+gf0.fit()
+```
+
 ### 1. Filter Genome
 
 First we need to filter the human genome. To do so, we implemented `Gene_Fusion.ipynb` that takes as input a gtf file which contains all the annotated human genome. The algorithm filters the data considering the _ensemble_ notation and gives as a result a correspondence one to one between a gene and its transcript. Since one gene can be associated to more than one transcript due to the splicing mechanims, in this case we selected the longest transcript and, in case of equality, the one that contains more CDS.
 At the end the results is ordered by chromosomes and stored in a csv file.
-The ipynb takes as argument the genome version of the input file coordinates: for semplicity we had already runned the file using GRCH37 and GRCH38. The csv results are inside the folder (NON LO SO), so you don't have to run again this part. For future updatings the time of run is about 20 minutues (di più). GRCH files can be downloaded [here](https://grch37.ensembl.org/info/data/ftp/index.html) and the usage of the function is the following one:
+The ipynb takes as argument the genome version of the input file coordinates: for semplicity we had already runned the file using GRCH37 and GRCH38. The csv results are inside the folder GRCh, so you don't have to run again this part. For future updatings the time of run is about 20 minutues (di più). GRCH files can be downloaded [here](https://grch37.ensembl.org/info/data/ftp/index.html) and the usage of the function is the following one:
 
-`python Gene_Fusion.py [-i INPUT] [-v VERSION]`
 
-DA AGGIUNGERE ALLA CLASSE
 
 ### 2. Gene Fusion
 
@@ -196,7 +193,7 @@ HHBlits is a very fast and sensitive algorithm thanks to a two-stage prefilter p
 
 As a result it produces an .a3m file that contains the HMM for the sequence and a .hhr file for the details.
 
-HHBlits was runned on [HPC Polito](https://hpc.polito.it/) using .... (le farei capire che non è stato bello)
+HHBlits was runned on [HPC Polito](https://hpc.polito.it/).
 
 Example of the usage of the tool: 
 
@@ -311,17 +308,30 @@ After the first statistical analysis, we proceed with the application of machine
     <p align="center">
       <img src="Figures/one_hot.PNG" alt="drawing" width="200"/>
     </p>
-  - **Word2Vec encoding**: 
+  - **Word2Vec encoding**:  Word2Vec is an encoding typical of Natural Language Processing. Following the example of [ProtVec](https://arxiv.org/ftp/arxiv/papers/1503/1503.05140.pdf), each sequence is broken into trigrams that are then used to train the algorithm. In particular, Word2Vec is a one layer neural network that takes in input one trigram and gives as output the probability of each of the other ones to be near the target. The hidden layer is 100, and it represents the features we are using. So at the end each sequence will be represented by a vector of 100 elements that is the sum of all the arrays of its trigrams.
 
 Before applying the encoding, in order to have as input sequences of the same size, we first perform two operations: **padding** and **cropping**. We decide to obtain as outputs sequences of size equals 1000, so shorter sequences are padded adding at the end a negative value; on the other hand, longer sequences are cropped starting from a random position.
  
 ## Neural Network <a name="nn"></a>
-Rete CONV
-LSTM
-UNA BELLA FIGURA DELLA RETE ???????????????????????????????? 
-a 10 e 1 canale
+We first tried to use a convolutional network neural network (CNN) which is an architecture thta can exploit well the sequential nature of our data.
+
+Our CNN has two modalities 
+* only matrix
+* matrix plus sequence, in this case we only used the one hot encoding version of sequence data.
+
+<p align="center">
+      <img src="Figures/Rete_conv.png" alt="drawing" width="700"/>
+</p>
+
+The model consists in two separate streams that converge into a single linear layer and softmax to perform the classification and gives as output a probability over two classes and the classification is done selecting the class with greather value.
+Each stream cosists in a convolutional layer with maxpool and a linear layer. The matrix branch has two consecutive linear layer and before the second one we linearize the matrix, both branches have the same dimentions and in the end they are summed over and passed to the classifier layer. The model presents batch normalization and dropout at the begging and at the end.
+We recall that the sequence branch is optional, and the model works fine with only the matrix data.
+
+The model can be customize with different starting hidden layer dimention. The dimention of the network expands untili it reaches the cassifier that compress the rappresentation before appling a softmax fuction.
+
+
 ## Machine Learning  <a name="ml"></a>
-After our attempts with deep learning, we tried to apply Machine Learning techniques both on the protein sequences and on the distance matrix flattened. For the protein sequences, we performed two types of encoding in order to give a proper input to the classifiers.
+After our attempt with deep learning, we tried to apply Machine Learning techniques both on the protein sequences and on the distance matrix flattened. For the protein sequences, we performed two types of encoding in order to give a proper input to the classifiers.
 
 ### 1. Random Forest <a name="rf"></a>
 Random forest is an ensemble machine learning technique that can be exploited both for classification and regression.
@@ -337,7 +347,30 @@ We finetuned the hyperparameters of the algorithm using grid search cross valida
 'max_features': ["auto", "sqrt", "log2"]
 'random_state': [1]
 'bootstrap': [True, False]
+
 ```
+
+Using the matrix as input data we achieved on the validation set the accuracy of: **0.90%**
+
+<p align="center">
+  <img src="Figures/conf_matrix_rf.png" alt="drawing" width="350"/>
+</p>
+
+That leads to **0.87%** of accuracy on the test set, as we cann notice in the confusion matrix.
+
+Using the one hot encoded sequences as input data we achieved on the validation set the accuracy of: **0.87**
+<p align="center">
+  <img src="Figures/conf_seq_rf.png" alt="drawing" width="350"/>
+</p>
+
+That leads to **0.90%** of accuracy on the test set, as we cann notice in the confusion matrix.
+
+Using the one Word2Vec sequences as input data we achieved on the validation set the accuracy of: **0.930**
+<p align="center">
+  <img src="Figures/conf_enc_rf.png" alt="drawing" width="350"/>
+</p>
+
+That leads to **0.91%** of accuracy on the test set, as we cann notice in the confusion matrix.
 
 ### 2. SVM <a name="svm"></a>
 Support Vector Machine is a supervised algorithm that aims at finding the best hyperplane that separates the training data and maximizes the margin, which is the distance between the hyperplane and the closest points from any class called support vectors. It can be used in linear and non-linear classification tasks: in this last case, the kernel trick is exploited to map the data into a higher dimensional space where the classes are linearly separable. However, for computational reasons we just use the linear version of the algorithm.
@@ -352,18 +385,42 @@ We finetuned the hyperparameters of the algorithm using grid search cross valida
 'C' : [ 0.1, 1, 10, 1000]
 ```
 
+Using the one hot encoded sequences as input data we achieved on the validation set the accuracy of: **0.86%**
+<p align="center">
+  <img src="Figures/conf_seq_linearsvc.png" alt="drawing" width="350"/>
+</p>
+
+That leads to **0.90%** of accuracy on the test set, as we cann notice in the confusion matrix.
+
+Using the one Word2Vec sequences as input data we achieved on the validation set the accuracy of: **0.89%**
+<p align="center">
+  <img src="Figures/conf_enc_linearsvc.png" alt="drawing" width="350"/>
+</p>
+
+That leads to **0.89%** of accuracy on the test set, as we cann notice in the confusion matrix.
+
 # Results <a name="results"></a>
 ## Accuracy <a name="results"></a>
 
-Using only the distance matrix and tuning the random forest we achieved an accuracy score of: XXXXXXXXXX
+Results are shown in the table above. 
 
-Instead, using only the amino acid sequence we achieved: XXXXXXXXXXXXX
+
+Since we are utilizing the one channel matrix for the classification, this means that the pattern under analysis can be visualized as an image.
+
+Moreover, experiments are performed using as input or the matrix or the sequence. Due to computational limit, we were able to consider only 1000 matrix. 
+In fact, the accuracy scores for the cases in which we are utilizing the matrix it is lower than the ones considering just the sequences. This might be due also to the error propagation trough the networks that is generated by the alignment and the distance matrix. Also, theoretically [sequences contain already all the information to retrive the 3d structure](https://en.wikipedia.org/wiki/Anfinsen%27s_dogma), in this sense we are just performing some advanced encoding tecniques.
+
 
 
 ## Conclusion <a name="results"></a>
 
-We can see that the 3d strcuture does not lead to a significant improving of the performance of the algorithm. In fact, as states in [Anfinsen's dogma](https://en.wikipedia.org/wiki/Anfinsen%27s_dogma) (sto esagerando?) the strcuture of a protein (at least for the littlest ones) is determined only by its amino acid sequence.
-In this sense, retriving the 3d structure does not add information (???) che sto dicendo, ha senso ?
-Besides, using all these tools to reacreating the 3d strcuture we are propagating error throgh the difefrent algorithm, and in this sense we are .... the data . AIUTO
+Our work addresses the need for an easy class that filters the best transcript over ensemble or Havana annotations over the dataset of human genome, moreover the class performs genefusion simulation with an arbitrary gene and break points.
+
+We also test this class on deePrior dataset and then we use the newly genereted sequence data to perform gene prioritization over oncogenes.
+We also penrich our data thanks to Uniprot30, that enchants the algorithm and try to perform gene prioritization with developed 3D data of the protein.
+
+We apply different techniques to classify the data and, as we can also in other binary classification task, NN aren't the only choice. We can also just use them to perform simple data preprocessing and features extraction and then revert back to ML algorithm that are easier to tune and deeploy reaching still optimal results.
+
+At the end, exploiting the 3d structure of the protein is not yet feasible as the algorithms that provide this structure have not reached optimal results, and the efforts due to computational complexity and memory storage are not worth in terms of accuracy.
 
 
