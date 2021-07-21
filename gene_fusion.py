@@ -65,6 +65,10 @@ class gene_fusion:
         self.out_dir = out_dir
         self.data = None
         self.table = None
+        self.config = {'nome': 0, 'Label': 0,
+                       'Chr5p': 0, 'Coord5p': 0, '5pEnsg': 0, '5pStrand': False, 'intron_5': False,
+                       'Chr3p': 0, 'Coord3p': 0, '3pEnsg': 0, '3pStrand': False, 'intron_3': False,
+                       'shift_5': 0, 'shift_3': 0, 'shift_tot': 0, 'flag_end_codon': 0}
 
     def load_tablet(self):
         self.table = pd.read_csv(self.dataset_path, sep='\t', index_col=0)
@@ -107,7 +111,7 @@ class gene_fusion:
             if flag_start:
                 if end - cnt < len(row):
                     seq.append(row[:end - cnt])
-                    break
+                    break #end found
                 else:
                     seq.append(row)
                     cnt = cnt + len(row)
@@ -123,138 +127,166 @@ class gene_fusion:
         gzip_fd.close()
         return ''.join(seq)
 
-    def print_fasta(self, Sequence, config):  # config = {nome, Chr5p, Chr3p, Coord5p, Coord3p}
-        if not os.path.isdir(self.out_dir):
-            os.mkdir(self.out_dir)
+    def print_fasta(self, Sequence, count=0):  # config = {nome, Chr5p, Chr3p, Coord5p, Coord3p}
+        out_dir = self.out_dir + self.config['nome'] + '_' + str(count) if count!=0 else self.out_dir + self.config['nome']
+        if not os.path.isdir(out_dir):
+            os.mkdir(out_dir)
 
-        with open(self.out_dir + '/' + config['nome'] + '.fa', 'w') as f:
-            f.writelines(['> ' + str(config)[1:-1], '\n', Sequence])
+        with open(out_dir + '/' + self.config['nome'] + '.fa', 'w') as f:
+            f.writelines(['> ' + str(self.config)[1:-1], '\n', Sequence])
 
-    def gene_fusion(self, data, chromosome, bp, flag5):  # 1--> 5, 0-->3
-        mask_in = ((data['Chr'] == chromosome) & (data['Start_T'] < bp) & (data['End_T'] > bp))
+    def filter_dataframe(self, gene, flag5):
 
-        list_out = []
-        list_gene = []
-        for gene in set(data[mask_in]['Gene']):
-            mask = mask_in & (data['Gene'] == gene)
-            gene_dataframe = data[mask]
-            list_gene.append(gene)
+        chromosome = self.config['Chr5p'] if flag5 else self.config['Chr3p']
+        bp = self.config['Coord5p'] if flag5 else self.config['Coord3p']
+        mask= ((self.data['Chr'] == chromosome) & (self.data['Gene'] == gene)
+               & (self.data['Start_T'] < bp) & (self.data['End_T'] > bp))
 
-            if gene_dataframe.iloc[-1]['Sign'] == '+':
-                sign = 0  # sing = 0 se +; 1 se -
-            else:
-                sign = 1
+        gene_dataframe = self.data[mask]
 
-            if bool(flag5) != bool(sign):  # se è 5+ o 3-
+        if flag5:
+            self.config['5pStrand'] = False if gene_dataframe.iloc[-1]['Sign'] == '+' else True  # sing = 0 se +; 1 se -
+            sign = self.config['5pStrand']
+        else:
+            self.config['3pStrand'] = False if gene_dataframe.iloc[-1]['Sign'] == '+' else True  # sing = 0 se +; 1 se -
+            sign = self.config['3pStrand']
 
-                mask = mask & (data['Start'] < bp)  # Take only bases before break point
-                gene_dataframe = data[mask]
+        if flag5 != sign:  # se è 5+ o 3-
 
-                if len(gene_dataframe) == 0:  # Exit early if no CDS is found
-                    list_out.append(" ")
-                    continue
-                if bp > int(gene_dataframe.iloc[-1]['End']):
-                    bp = gene_dataframe.iloc[-1]['End']
+            mask = mask & (self.data['Start'] < bp)  # Take only bases before break point
+            gene_dataframe = self.data[mask]
+
+            if bp > int(gene_dataframe.iloc[-1]['End']):
+                if flag5:
+                    self.config['intron_5'] = True
                 else:
-                    gene_dataframe = (gene_dataframe.replace(gene_dataframe.iloc[-1]['End'], bp)).reset_index()
-                start = gene_dataframe.iloc[0]['Start']
-                end = gene_dataframe.iloc[-1]['End']
+                    self.config['intron_3'] = True
 
-            else:  # se è 5- o 3+
-                mask = mask & (data['End'] > bp)  # Take only bases before break point
-                gene_dataframe = data[mask]
-
-                if len(gene_dataframe) == 0:  # Exit early if no CDS is found
-                    list_out.append(" ")
-                    continue
-                if bp < gene_dataframe.iloc[0]['Start']:
-                    bp = gene_dataframe.iloc[0]['Start']
-                else:
-                    gene_dataframe = gene_dataframe.replace(gene_dataframe.iloc[0]['Start'], bp)
-                start = gene_dataframe.iloc[0]['Start']
-                end = gene_dataframe.iloc[-1]['End']
-
-            gene_dataframe = gene_dataframe.reset_index()
-
-            # Load Chromosome DNA
-            DNA = self.retrive_sequence_dna(start - 1, end, chromosome)  # zip version is for files still compressed
-
-            part = []
-            n = len(gene_dataframe)
-
-            # Retrive all CDSs sequences
-            for i in range(n):
-                start_tmp, end_tmp = gene_dataframe.loc[i, ['Start', 'End']].values
-                CDS = DNA[start_tmp - start:end_tmp + 1 - start]  # Take the sequence
-
-                if sign == 1: CDS = complementa(CDS)
-                part.append(CDS)
-
-            # Unite all CDSs sequences
-            if sign == 1:
-                part = ''.join(part[::-1])
             else:
-                part = ''.join(part)
+                gene_dataframe = (gene_dataframe.replace(gene_dataframe.iloc[-1]['End'], bp)).reset_index()
 
-            list_out.append(part)
-        return list_out, list_gene
+        else:  # se è 5- o 3+
+            mask = mask & (self.data['End'] > bp)  # Take only bases before break point
+            gene_dataframe = self.data[mask]
+
+            if bp < gene_dataframe.iloc[0]['Start']:
+                if flag5:
+                    self.config['intron_5'] = True
+                else:
+                    self.config['intron_3'] = True
+            else:
+                gene_dataframe = gene_dataframe.replace(gene_dataframe.iloc[0]['Start'], bp)
+
+        return gene_dataframe.reset_index()
+
+    def check_multiple_gene(self, flag5):
+        chromosome = self.config['Chr5p'] if flag5 else self.config['Chr3p']
+        bp = self.config['Coord5p'] if flag5 else self.config['Coord3p']
+        mask_in = ((self.data['Chr'] == chromosome) & (self.data['Start_T'] < bp) & (self.data['End_T'] > bp))
+        return set(self.data[mask_in]['Gene'])
+
+    def gene_seq_retrival(self, gene, introne, flag5):  # 1--> 5, 0-->3
+
+        chromosome = self.config['Chr5p'] if flag5 else self.config['Chr3p']
+
+        gene_dataframe = self.filter_dataframe(gene, flag5)
+        if len(gene_dataframe) == 0:
+            return " "
+
+        sign = self.config['5pStrand'] if flag5 else self.config['3pStrand']
+
+        if introne:
+            if flag5:
+                DNA = self.retrive_sequence_dna(gene_dataframe.iloc[0]['Start'] - 1, self.config['Coord5p'],
+                                                chromosome)  # zip version is for files still compressed
+                start = gene_dataframe.iloc[0]['Start']
+                end = self.config['Coord5p']
+            else:
+                DNA = self.retrive_sequence_dna(self.config['Coord3p'] - 1, gene_dataframe.iloc[-1]['End'],
+                                                chromosome)  # zip version is for files still compressed
+                start = self.config['Coord3p']
+                end = gene_dataframe.iloc[-1]['End']
+        # Load Chromosome DNA
+        else:
+            DNA = self.retrive_sequence_dna(gene_dataframe.iloc[0]['Start'] - 1, gene_dataframe.iloc[-1]['End'],
+                                        chromosome)  # zip version is for files still compressed
+            start = gene_dataframe.iloc[0]['Start']
+            end = gene_dataframe.iloc[-1]['End']
+
+        part = []
+        n = len(gene_dataframe)
+
+        # Retrive all CDSs sequences
+        if introne and not(flag5):
+            part.append(DNA[:gene_dataframe.loc[0, ['Start']].values + 1 - start])
+        for i in range(n):
+            start_tmp, end_tmp = gene_dataframe.loc[i, ['Start', 'End']].values
+            CDS = DNA[start_tmp - start:end_tmp + 1 - start]  # Take the sequence
+
+            if sign: CDS = complementa(CDS)
+            part.append(CDS)
+        if introne and flag5:
+            part.append(DNA[gene_dataframe.loc[n, ['end']].values - start:])
+
+        # Unite all CDSs sequences
+        if sign:
+            part = ''.join(part[::-1])
+        else:
+            part = ''.join(part)
+
+        return part
 
     def fit(self):
         # ADI ha sempre ragione
 
-        # config = {nome, Chr5p, Chr3p, Coord5p, Coord3p}
-        config = {'nome': 0, 'Label': 0,
-                  'Chr5p': 0, 'Coord5p': 0, '5pEnsg': 0, '5pStrand': 0,
-                  'Chr3p': 0, 'Coord3p': 0, '3pEnsg': 0, '3pStrand': 0,
-                  'shift_5': 0, 'shift_3': 0, 'shift_tot': 0, 'flag_end_codon': 0}
-
-        # to_do = list(np.load('/content/drive/MyDrive/Fastas/problems.npy'))
-        # to_delete_1 = [255, 256, 308, 373, 376, 410, 411, 412, 414,
-        # 415, 416, 417, 418, 441, 442, 454, 502]
-
-        problems = []
         for index, row in self.table.iterrows():
             if str(index) + '_' + row['FusionPair'] not in os.listdir(self.out_dir):
                 # if index in to_do:
 
-                config['nome'] = str(index) + '_' + row['FusionPair']
-                config['Chr5p'] = row['Chr5p']
-                config['Chr3p'] = row['Chr3p']
-                config['Coord5p'] = int(row['Coord5p'])
-                config['Coord3p'] = int(row['Coord3p'])
-                config['5pStrand'] = str(row['5pStrand'])
-                config['3pStrand'] = str(row['3pStrand'])
-                config['Label'] = int(row['Label'])
+                self.config['nome'] = str(index) + '_' + row['FusionPair']
+                self.config['Chr5p'] = row['Chr5p']
+                self.config['Chr3p'] = row['Chr3p']
+                self.config['Coord5p'] = int(row['Coord5p'])
+                self.config['Coord3p'] = int(row['Coord3p'])
+                self.config['5pStrand'] = str(row['5pStrand'])
+                self.config['3pStrand'] = str(row['3pStrand'])
+                self.config['Label'] = int(row['Label'])
 
                 count = 0
                 # ANDRE HA CAMBIATO COMBINATIONS CON PRODUCT
-                seq_5, gene_5 = self.gene_fusion(self.data, config['Chr5p'], config['Coord5p'], 1)
-                seq_3, gene_3 = self.gene_fusion(self.data, config['Chr3p'], config['Coord3p'], 0)
 
-                combinations = list(itertools.product(seq_5, seq_3))
+                gene_5 = self.check_multiple_gene(True)
+                gene_3 = self.check_multiple_gene(False)
+
                 combinations_genes = list(itertools.product(gene_5, gene_3))
 
-                for result, res_gene in zip(combinations, combinations_genes):
-                    a = str(result[0])
-                    b = str(result[1])
+                for res_gene in combinations_genes:
+                    gene_dataframe_5 = self.filter_dataframe(res_gene[0], True)
+                    gene_dataframe_3 = self.filter_dataframe(res_gene[1], False)
+                    if self.config['intron_5'] != self.config['intron_3']:
+                        a = self.gene_seq_retrival(gene_dataframe_5, self.config['intron_5'], True)
+                        b = self.gene_seq_retrival(gene_dataframe_3, self.config['intron_3'], False)
+                    else:
+                        a = self.gene_seq_retrival(gene_dataframe_5, False, True)
+                        b = self.gene_seq_retrival(gene_dataframe_3, False, False)
+
                     result = a + b
 
-                    config['5pEnsg'] = res_gene[0]
-                    config['3pEnsg'] = res_gene[1]
-                    config['shift_5'] = len(a) % 3
-                    config['shift_3'] = len(b) % 3
-                    config['shift_tot'] = len(result) % 3
+                    self.config['5pEnsg'] = res_gene[0]
+                    self.config['3pEnsg'] = res_gene[1]
+                    self.config['shift_5'] = len(a) % 3
+                    self.config['shift_3'] = len(b) % 3
+                    self.config['shift_tot'] = len(result) % 3
 
-                    amino_seq, config['flag_end_codon'] = translate(result)
+                    amino_seq, self.config['flag_end_codon'] = translate(result)
 
                     if count == 0:
                         print('fatto')
-                        self.print_fasta(amino_seq, config)
+                        self.print_fasta(amino_seq)
                     else:
                         # if index in to_delete_1: continue
                         print(f'multi out with {index}')
-                        problems.append(index)
-                        self.print_fasta(self.out_dir + config['nome'] + '_' + str(count), amino_seq, config)
+                        self.print_fasta(amino_seq, count)
                     count += 1
 
 
