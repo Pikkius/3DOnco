@@ -1,4 +1,4 @@
-# 3DOnco - An oncogenic fusion prediction tool (Mari is editing)
+# 3DOnco - An oncogenic fusion prediction tool
 
 <b>The tool is a gene fusion prioritization algorithm for the classification of oncogenic and not oncogenic proteins: starting from 2 chromosomes and their breakpoints the tool simulates the gene fusion and then predicts the nature of the hybrid protein as oncogenic or not through its 3d structure. </b>
 
@@ -35,14 +35,7 @@ For this purpose we used the data from [DEEPrior](https://github.com/bioinformat
 
 The gene fusions of the training set are validated and the label values 1 if the fusion is oncogenic, 0 otherwise. 
 
-The data of the training set are collected from [COSMIC](https://cancer.sanger.ac.uk/cosmic/fusion) (Catalog of Somatic Mutations in Cancer) for Oncogenic gene fusions and [Babicenau et al. work Recurrent chimeric fusion rnas in non-cancer tissues and cells](https://pubmed.ncbi.nlm.nih.gov/26837576/) for not oncogenic ones. Moreover, we have two different datasets to test the model: 
-
-* the Onco gene fusions of the first one are obtained from the ChimerDB2.0 database, while the Not Onco corresponds to the false positives reported by TopHat-Fusion and STAR-Fusion on Illumina BodyMap 2.0 samples; 
-* the second test set is composed by oncogenic gene fusions built from the work of [Gao et al. Driver fusions and their implications in the development and treatment of human cancers](https://pubmed.ncbi.nlm.nih.gov/29617662/).
-
-In the figures below, we can see the **distribution** of our data:
-- PLOTS DISTRIBUZIONE DATI
-- PLOTS DISTRIBUZIONE LUNGHEZZE
+The data of the training set are collected from [COSMIC](https://cancer.sanger.ac.uk/cosmic/fusion) (Catalog of Somatic Mutations in Cancer) for Oncogenic gene fusions and [Babicenau et al. work Recurrent chimeric fusion rnas in non-cancer tissues and cells](https://pubmed.ncbi.nlm.nih.gov/26837576/) for not oncogenic ones. Moreover, we have a specific dataset to test the model whose Onco gene fusions are obtained from the ChimerDB2.0 database, while the Not Onco corresponds to the false positives reported by TopHat-Fusion and STAR-Fusion on Illumina BodyMap 2.0 samples.
 
 # Gene Fusion <a name="Gene"></a>
 
@@ -115,15 +108,15 @@ gf0.fit()
 
 First we need to filter the human genome. To do so, we implemented `Gene_Fusion.ipynb` that takes as input a gtf file which contains all the annotated human genome. The algorithm filters the data considering the _ensemble_ notation and gives as a result a correspondence one to one between a gene and its transcript. Since one gene can be associated to more than one transcript due to the splicing mechanims, in this case we selected the longest transcript and, in case of equality, the one that contains more CDS.
 At the end the results is ordered by chromosomes and stored in a csv file.
-The ipynb takes as argument the genome version of the input file coordinates: for semplicity we had already runned the file using GRCH37 and GRCH38. The csv results are inside the folder GRCh, so you don't have to run again this part. For future updatings the time of run is about 20 minutues (di più). GRCH files can be downloaded [here](https://grch37.ensembl.org/info/data/ftp/index.html) and the usage of the function is the following one:
+The ipynb takes as argument the genome version of the input file coordinates: for semplicity we had already runned the file using GRCH37 and GRCH38. The csv results are inside the folder GRCh, so you don't have to run again this part. For future updatings the time of run is about 20 minutues. GRCH files can be downloaded [here](https://grch37.ensembl.org/info/data/ftp/index.html).
 
 
 
 ### 2. Gene Fusion
 
-We prepared a function to simulate gene fusion in Gene_fusion_Andre.ipynb.
+As a second step, we prepared a function to simulate gene fusion.
 The script takes as input 2 chromosomes and 2 breakpoints and then simulate the gene fusion. The first pair is associated to the 5' gene and the second one to the 3' gene.
-Moreover, in order to run the code we need the gtf files for all the 48 chromosome and the csv file generated in the previous point. You can download the files from LINKS
+Moreover, in order to run the code we need the gtf files for all the 48 chromosome and the csv file generated in the previous point. You can download the files [here](https://github.com/Pikkius/treDOnco/tree/main/GRCh).
 
 As input we utilized the fusion pairs provided in DEEPrior. In any case, the file can take as input any csv file formatted as follow: 
 
@@ -193,7 +186,7 @@ HHBlits is a very fast and sensitive algorithm thanks to a two-stage prefilter p
 
 As a result it produces an .a3m file that contains the HMM for the sequence and a .hhr file for the details.
 
-HHBlits was runned on [HPC Polito](https://hpc.polito.it/).
+HHBlits was runned on [HPC Polito](https://hpc.polito.it/) giving different resources to the different jobs according to the length of the sequences. For this reason, some sequences were not processed because of computational time and memory problems.
 
 Example of the usage of the tool: 
 
@@ -203,13 +196,11 @@ hhblits -cpu 2 -i ${TARGET_SEQ}.fa -d Project/database/uniclust30_2018_08/uniclu
 
 ## ProSPr : Democratized Implementation of Alphafold Protein Distance Prediction Network <a name="prospr"></a>
 
-Deep mind's folding algorithm code for [Alphafold](https://deepmind.com/blog/article/alphafold-a-solution-to-a-50-year-old-grand-challenge-in-biology) is still not available but [ProSPr](https://www.biorxiv.org/content/10.1101/830273v1) enbles us to exploit ..., so we are able to retrieve the distance matrix from each sequence.
+Deep mind's folding algorithm code for [Alphafold](https://deepmind.com/blog/article/alphafold-a-solution-to-a-50-year-old-grand-challenge-in-biology) is still not available but [ProSPr](https://www.biorxiv.org/content/10.1101/830273v1) enables us to retrieve the distance matrix from each sequence.
 
 <p align="center">
   <img src="Figures/distance_matrix.png" alt="drawing" width="350"/>
 </p>
-
-The matrix represents the probability that amino acid i and j is less than a certain treshold.
 
 In addition alphafold exploits these information together with a folding algorithm (like [Rosetta](https://boinc.bakerlab.org/)) that takes into account electostatic forces, vand der Waals interaction and so on. 
 
@@ -308,12 +299,12 @@ After the first statistical analysis, we proceed with the application of machine
     <p align="center">
       <img src="Figures/one_hot.PNG" alt="drawing" width="200"/>
     </p>
-  - **Word2Vec encoding**:  Word2Vec is an encoding typical of Natural Language Processing. Following the example of [ProtVec](https://arxiv.org/ftp/arxiv/papers/1503/1503.05140.pdf), each sequence is broken into trigrams that are then used to train the algorithm. In particular, Word2Vec is a one layer neural network that takes in input one trigram and gives as output the probability of each of the other ones to be near the target. The hidden layer is 100, and it represents the features we are using. So at the end each sequence will be represented by a vector of 100 elements that is the sum of all the arrays of its trigrams.
+  - **Word2Vec encoding**:  Word2Vec is an encoding typical of Natural Language Processing. Following the example of [ProtVec](https://arxiv.org/ftp/arxiv/papers/1503/1503.05140.pdf), each sequence is broken into trigrams that are then used to train the algorithm. In particular, Word2Vec is a one layer neural network that takes as input one trigram and gives as output the probability of each of the other ones to be near the target. The hidden layer is 100, and it represents the features we are using. So at the end each sequence will be represented by a vector of 100 elements that is the sum of all the arrays of its trigrams.
 
 Before applying the encoding, in order to have as input sequences of the same size, we first perform two operations: **padding** and **cropping**. We decide to obtain as outputs sequences of size equals 1000, so shorter sequences are padded adding at the end a negative value; on the other hand, longer sequences are cropped starting from a random position.
  
 ## Neural Network <a name="nn"></a>
-We first tried to use a convolutional network neural network (CNN) which is an architecture thta can exploit well the sequential nature of our data.
+We first tried to use a convolutional network neural network (CNN) which is an architecture that can exploit well the sequential nature of our data.
 
 Our CNN has two modalities 
 * only matrix
@@ -324,10 +315,10 @@ Our CNN has two modalities
 </p>
 
 The model consists in two separate streams that converge into a single linear layer and softmax to perform the classification and gives as output a probability over two classes and the classification is done selecting the class with greather value.
-Each stream cosists in a convolutional layer with maxpool and a linear layer. The matrix branch has two consecutive linear layer and before the second one we linearize the matrix, both branches have the same dimentions and in the end they are summed over and passed to the classifier layer. The model presents batch normalization and dropout at the begging and at the end.
+Each stream consists in a convolutional layer with maxpool and a linear layer. The matrix branch has two consecutive linear layer and before the second one we linearize the matrix, both branches have the same dimentions and in the end they are summed over and passed to the classifier layer. The model presents batch normalization and dropout at the beginning and at the end.
 We recall that the sequence branch is optional, and the model works fine with only the matrix data.
 
-The model can be customize with different starting hidden layer dimention. The dimention of the network expands untili it reaches the cassifier that compress the rappresentation before appling a softmax fuction.
+The model can be customized with different starting hidden layer dimention. The dimention of the network expands until it reaches the cassifier that compress the rappresentation before applying a softmax fuction.
 
 
 ## Machine Learning  <a name="ml"></a>
@@ -356,7 +347,7 @@ Using the matrix as input data we achieved on the validation set the accuracy of
   <img src="Figures/conf_matrix_rf.png" alt="drawing" width="350"/>
 </p>
 
-That leads to **0.87%** of accuracy on the test set, as we cann notice in the confusion matrix.
+That leads to **0.87%** of accuracy on the test set, as we can notice in the confusion matrix.
 
 Using the one hot encoded sequences as input data we achieved on the validation set the accuracy of: **0.87**
 <p align="center">
@@ -397,18 +388,13 @@ Using the one Word2Vec sequences as input data we achieved on the validation set
   <img src="Figures/conf_enc_linearsvc.png" alt="drawing" width="350"/>
 </p>
 
-That leads to **0.89%** of accuracy on the test set, as we cann notice in the confusion matrix.
+That leads to **0.89%** of accuracy on the test set, as we can notice in the confusion matrix.
 
-# Results <a name="results"></a>
-## Accuracy <a name="results"></a>
-
-Results are shown in the table above. 
-
-
+# Considerations <a name="results"></a>
 Since we are utilizing the one channel matrix for the classification, this means that the pattern under analysis can be visualized as an image.
 
-Moreover, experiments are performed using as input or the matrix or the sequence. Due to computational limit, we were able to consider only 1000 matrix. 
-In fact, the accuracy scores for the cases in which we are utilizing the matrix it is lower than the ones considering just the sequences. This might be due also to the error propagation trough the networks that is generated by the alignment and the distance matrix. Also, theoretically [sequences contain already all the information to retrive the 3d structure](https://en.wikipedia.org/wiki/Anfinsen%27s_dogma), in this sense we are just performing some advanced encoding tecniques.
+Moreover, experiments are performed using as input the matrix or the sequence. Due to computational limit, we were able to consider only 1000 matrix. 
+In fact, the accuracy scores for the cases in which we are utilizing the matrix is lower than the ones considering just the sequences. This might be due also to the error propagation trough the networks that is generated by the alignment and the distance matrix. Also, theoretically [sequences contain already all the information to retrieve the 3d structure](https://en.wikipedia.org/wiki/Anfinsen%27s_dogma), in this sense we are just performing some advanced encoding tecniques.
 
 
 
@@ -417,9 +403,9 @@ In fact, the accuracy scores for the cases in which we are utilizing the matrix 
 Our work addresses the need for an easy class that filters the best transcript over ensemble or Havana annotations over the dataset of human genome, moreover the class performs genefusion simulation with an arbitrary gene and break points.
 
 We also test this class on deePrior dataset and then we use the newly genereted sequence data to perform gene prioritization over oncogenes.
-We also penrich our data thanks to Uniprot30, that enchants the algorithm and try to perform gene prioritization with developed 3D data of the protein.
+We also enrich our data thanks to Uniprot30, that enchants the algorithm and try to perform gene prioritization with developed 3D data of the protein.
 
-We apply different techniques to classify the data and, as we can also in other binary classification task, NN aren't the only choice. We can also just use them to perform simple data preprocessing and features extraction and then revert back to ML algorithm that are easier to tune and deeploy reaching still optimal results.
+We apply different techniques to classify the data and, as we can notice also in other binary classification task, NN aren't the only choice. We can also just use them to perform simple data preprocessing and features extraction and then revert back to ML algorithm that are easier to tune and deploy reaching still optimal results.
 
 At the end, exploiting the 3d structure of the protein is not yet feasible as the algorithms that provide this structure have not reached optimal results, and the efforts due to computational complexity and memory storage are not worth in terms of accuracy.
 
