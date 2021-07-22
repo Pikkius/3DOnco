@@ -7,12 +7,13 @@ from torch.utils.data import Dataset
 
 class Protein(Dataset):
 
-    def __init__(self, root, seq_len):
+    def __init__(self, root, seq_len, flag_lstm=False):
 
         self.root = root
         self.prot_names = dict()
         self.labels = []
         self.indexs = []
+        self.lstm = flag_lstm
 
         self.seq_len = seq_len
 
@@ -43,6 +44,20 @@ class Protein(Dataset):
         features['dist_bin'] = np.zeros_like(features['matrix'][0])
         for i in range(10):
             features['dist_bin'] += pkl['dist_bin_map'][i] * features['matrix'][i]
+
+        if self.lstm:
+            tmp = []
+            for i in range(int(self.seq_len/64)):
+                tmp.append(features['dist_bin']
+                           [int(i* 64):int((i+1)* 64),
+                           int(i* 64):int((i+1)* 64)])
+            features['dist_bin'] = tmp
+
+            tmp = []
+            for i in range(int(self.seq_len/64)):
+                tmp.append(features['seq'][:,
+                           int(i * 64):int((i + 1) * 64)])
+            features['seq'] = tmp
 
         fa_name = f'{self.root}/{name}/{name}.fa'  # fa_name=f'{path}/{name}/{name}.fa'
         with open(fa_name) as f:

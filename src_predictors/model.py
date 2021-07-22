@@ -168,42 +168,42 @@ class MyConvLSTMCell(torch.nn.Module):
 
 
 class attentionLSTM(torch.nn.Module):
-    def __init__(self, num_classes=2, hidden_dim=128, n_step_RNN=16):
+    def __init__(self, num_classes=2, hidden_dim=128):
         super(attentionLSTM, self).__init__()
         self.num_classes = num_classes
-        self.n_step_RNN = n_step_RNN
+        self.hidden_dim = hidden_dim
 
         self.lstm_cell_m = MyConvLSTMCell(1, hidden_dim, conv_type='2D')
         self.avgpool_m = torch.nn.AvgPool2d(7)
-        self.classifier_m = torch.nn.Sequential(torch.nn.Dropout(0.7), torch.nn.Linear(hidden_dim, self.num_classes))
+        self.classifier_m = torch.nn.Sequential(torch.nn.Dropout(0.7),
+                                                torch.nn.Linear(hidden_dim * 9 * 9, self.num_classes))
 
         self.lstm_cell_s = MyConvLSTMCell(20, hidden_dim, conv_type='1D')
         self.avgpool_s = torch.nn.AvgPool2d(7)
-        self.classifier_s = torch.nn.Sequential(torch.nn.Dropout(0.7), torch.nn.Linear(hidden_dim, self.num_classes))
+        self.classifier_s = torch.nn.Sequential(torch.nn.Dropout(0.7),
+                                                torch.nn.Linear(2 * 9 * 9, self.num_classes))
 
         self.softmax = torch.nn.Softmax()
 
     def forward(self, inputVariable):
         # matrix
 
-        for i in inputVariable:
-            print(i.shape)
-        matrixes = inputVariable[1].view(inputVariable[1].shape[1], inputVariable[1].shape[0], 1, inputVariable[1].shape[1])  # batch x seq x seq
-        sequences = inputVariable[0]  # batch x 20 x seq
+        matrixes = inputVariable[1].view(inputVariable[1].shape[1],inputVariable[1].shape[0],
+                                         1, 64, 64)  # batch x seq x seq
+        sequences = inputVariable[0].view(inputVariable[0].shape[1],inputVariable[0].shape[0],
+                                          *inputVariable[0].shape[2:])  # batch x 20 x seq
 
-        state = (torch.zeros((1, *matrixes.shape)).cuda(),  # vocab x seq x seq
-                 torch.zeros((1, *matrixes[0].shape)).cuda())
-
-        print(state[0].shape, state[1].shape, matrixes[0].shape)
+        state = (torch.zeros((matrixes.shape[1], self.hidden_dim, 64, 64)).cuda(),  # vocab x seq x seq
+                 torch.zeros((matrixes.shape[1], self.hidden_dim, 64, 64)).cuda())
 
         for t in range(matrixes.size(0)):  # sui pices
-            state = self.lstm_cell_m(torch.unsqueeze(matrixes[t], 0), state)
+            state = self.lstm_cell_m(matrixes[t], state)
 
         feats1_matrix = self.avgpool_m(state[1]).view(state[1].size(0), -1)
         feats_matrix = self.classifier_m(feats1_matrix)
 
-        state = (torch.zeros(*sequences[0].shape).cuda(),  # vocab x seq
-                 torch.zeros(*sequences[0].shape).cuda())
+        state = (torch.zeros(inputVariable[0].shape[0], self.hidden_dim, 64).cuda(),  # vocab x seq
+                 torch.zeros(inputVariable[0].shape[0], self.hidden_dim, 64).cuda())
 
         for t in range(sequences.size(0)):  # sui pices
             state = self.lstm_cell_s(sequences[t], state)
@@ -212,9 +212,4 @@ class attentionLSTM(torch.nn.Module):
         feats_sequence = self.classifier_s(feats1_sequence)
         feats = self.softmax(feats_sequence + feats_matrix)
 
-        return torch.unsqueeze(feats, 0)  # ripristinare il batch di 1
-
-
-    def cropper(self, values, matrix=True):
-        if matrix:
-            return ma
+        return feats  # ripristinare il batch di 1

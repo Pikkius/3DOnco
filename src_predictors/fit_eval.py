@@ -20,6 +20,7 @@ def Train(train_set, val_set, config):
         net = net.to(config.DEVICE)
     elif config.NET == attentionLSTM:
         net = config.NET()
+        net = net.to(config.DEVICE)
 
     criterion = nn.CrossEntropyLoss()
     parameters_to_optimize = net.parameters()

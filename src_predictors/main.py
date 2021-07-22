@@ -11,8 +11,9 @@ from model import attentionLSTM, model_3DOnco
 if __name__ == '__main__':
 
     config = Config()
-    config.SEQ_LEN = 512
-    dataset = Protein(root='/media/andrea/7A2E5C122E5BC633/Users/Andrea/Documents/Materie/BioInfo/Fastas', seq_len=config.SEQ_LEN)
+    config.SEQ_LEN = 128
+    dataset = Protein(root='/media/andrea/7A2E5C122E5BC633/Users/Andrea/Documents/Materie/BioInfo/Fastas',
+                      seq_len=config.SEQ_LEN, flag_lstm=True)
 
     train_tmp_indexes, test_indexes, label_train_tmp, label_test = train_test_split(dataset.indexs, dataset.labels,
                                                                                     test_size=0.1,
@@ -21,7 +22,7 @@ if __name__ == '__main__':
                                                                           test_size=0.2, stratify=label_train_tmp)
     config.LR = 0.004
     config.STEP_SIZE = 12
-    config.NET = model_3DOnco
+    config.NET = attentionLSTM
 
     config.BATCH_SIZE = 25
     config.LOG_FREQUENCY = 15
