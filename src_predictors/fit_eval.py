@@ -113,7 +113,7 @@ def Train(train_set, val_set, config):
         plt.plot(acc_list_train, label='Train')
         plt.plot(acc_list_val, label='Val')
         plt.legend()
-        plt.savefig(config.out_dir + '/loss.png')
+        plt.savefig(config.out_dir + '/accuracy.png')
         plt.close()
 
     print('Best model found at step {}'.format(best_step))

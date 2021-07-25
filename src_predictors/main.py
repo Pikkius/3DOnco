@@ -11,21 +11,21 @@ from model import attentionLSTM, model_3DOnco
 if __name__ == '__main__':
 
     config = Config()
-    config.SEQ_LEN = 128
+    config.SEQ_LEN = 1024
     dataset = Protein(root='/media/andrea/7A2E5C122E5BC633/Users/Andrea/Documents/Materie/BioInfo/Fastas',
-                      seq_len=config.SEQ_LEN, flag_lstm=True)
+                      seq_len=config.SEQ_LEN)
 
     train_tmp_indexes, test_indexes, label_train_tmp, label_test = train_test_split(dataset.indexs, dataset.labels,
                                                                                     test_size=0.1,
                                                                                     stratify=dataset.labels)
     train_indexes, val_indexes, label_train, label_val = train_test_split(train_tmp_indexes, label_train_tmp,
                                                                           test_size=0.2, stratify=label_train_tmp)
-    config.LR = 0.004
+    config.LR = 0.00008
     config.STEP_SIZE = 12
-    config.NET = attentionLSTM
+    config.NET = model_3DOnco
 
     config.BATCH_SIZE = 25
-    config.LOG_FREQUENCY = 15
+    config.LOG_FREQUENCY = 10
     config.DEVICE = 'cuda'
 
     train_dataset = Subset(dataset, train_indexes)

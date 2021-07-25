@@ -12,8 +12,8 @@ class Config:
     save_graph = True
     LR = 0.007  # The initial Learning Rate
     MOMENTUM = 0.9  # Hyperparameter for SGD, keep this at 0.9 when using SGD
-    WEIGHT_DECAY = 5e-5  # Regularization, you can keep this at the default
-    NUM_EPOCHS = 20  # Total number of training epochs (iterations over dataset)
+    WEIGHT_DECAY = 5e-6  # Regularization, you can keep this at the default
+    NUM_EPOCHS = 40  # Total number of training epochs (iterations over dataset)
     STEP_SIZE = 20
     GAMMA = 0.1
     LOG_FREQUENCY = 20
